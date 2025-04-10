@@ -7,9 +7,15 @@ import { Button } from "@/components/ui/button"
 import { useIntegrationApp } from "@integration-app/react"
 
 type LookupType = "phone" | "email"
+type Contact = {
+  firstName?: string
+  lastName?: string
+  primaryEmail?: string
+  [key: string]: unknown
+}
 type LookupResult = {
   error?: string
-  contact?: unknown
+  contact?: Contact
 }
 
 export default function LookupPage() {
@@ -17,11 +23,19 @@ export default function LookupPage() {
   const [lookupValue, setLookupValue] = useState("")
   const [result, setResult] = useState<LookupResult | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [editedContact, setEditedContact] = useState<Contact | null>(null)
+  const [hasSearched, setHasSearched] = useState(false)
   const integrationApp = useIntegrationApp()
 
   const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setLookupType(e.target.value as LookupType)
     setLookupValue("")
+    setHasSearched(false)
+  }
+
+  const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLookupValue(e.target.value)
+    setHasSearched(false)
   }
 
   const handleLookup = async () => {
@@ -30,6 +44,8 @@ export default function LookupPage() {
       
       setIsLoading(true)
       setResult(null)
+      setEditedContact(null)
+      setHasSearched(true)
 
       const connections = await integrationApp.connections.find()
       const firstConnection = connections.items?.[0]
@@ -47,18 +63,23 @@ export default function LookupPage() {
         ? { phoneNumber: lookupValue }
         : { email: lookupValue }
 
-      // Call the action to find contact
       const response = await integrationApp
         .connection(firstConnection.id)
         .action(action)
         .run(params)
 
-      setResult({ contact: response.output })
+      const contact = response?.output?.fields as Contact
+      setEditedContact(contact)
     } catch (error) {
       setResult({ error: String(error) })
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleContactChange = (field: keyof Contact, value: string) => {
+    if (!editedContact) return
+    setEditedContact({ ...editedContact, [field]: value })
   }
 
   return (
@@ -81,7 +102,7 @@ export default function LookupPage() {
           <Input
             type={lookupType === "email" ? "email" : "text"}
             value={lookupValue}
-            onChange={(e) => setLookupValue(e.target.value)}
+            onChange={handleValueChange}
             placeholder={lookupType === "phone" ? "Enter phone number" : "Enter email"}
           />
         </div>
@@ -91,12 +112,48 @@ export default function LookupPage() {
         </Button>
       </div>
 
-      {result && (
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-4">Result</h2>
-          <pre className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg overflow-auto">
-            {JSON.stringify(result, null, 2)}
-          </pre>
+      {result?.error && (
+        <div className="mt-8 text-red-600">
+          Error: {result.error}
+        </div>
+      )}
+
+      {!isLoading && !result?.error && !editedContact && hasSearched && (
+        <div className="mt-8 text-gray-600 text-sm">
+          No contact found
+        </div>
+      )}
+
+      {editedContact && (
+        <div className="mt-8 max-w-2xl">
+          <h2 className="text-xl font-semibold mb-4">Contact Details</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">First Name</label>
+              <Input
+                value={editedContact.firstName || ""}
+                onChange={(e) => handleContactChange("firstName", e.target.value)}
+                placeholder="First Name"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Last Name</label>
+              <Input
+                value={editedContact.lastName || ""}
+                onChange={(e) => handleContactChange("lastName", e.target.value)}
+                placeholder="Last Name"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Email</label>
+              <Input
+                type="email"
+                value={editedContact.primaryEmail || ""}
+                onChange={(e) => handleContactChange("primaryEmail", e.target.value)}
+                placeholder="Email"
+              />
+            </div>
+          </div>
         </div>
       )}
     </div>
