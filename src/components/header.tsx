@@ -48,6 +48,12 @@ export function Header() {
               >
                 Contacts
               </Link>
+              <Link
+                href="/lookup"
+                className="inline-flex items-center px-1 pt-1 text-sm font-medium"
+              >
+                Lookup
+              </Link>
             </div>
           </div>
           <div className="flex items-center">
