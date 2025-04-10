@@ -8,8 +8,8 @@ export interface Contact {
   updated_at?: string;  // keep for backward compatibility
   uri?: string;
   fields?: {
-    domain?: string;
-    industry?: string;
+    primaryEmail?: string;
+    primaryPhone?: string;
     [key: string]: any;
   };
 }

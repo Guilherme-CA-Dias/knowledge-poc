@@ -42,8 +42,8 @@ export function ContactsTable({
   const columnWidths = {
     id: "150px",
     name: "200px",
-    industry: "200px",
-    domain: "200px",
+    email: "250px",
+    phone: "150px",
     createdAt: "200px",
     updatedAt: "200px"
   };
@@ -51,7 +51,7 @@ export function ContactsTable({
   const tableStyles = {
     table: {
       width: '100%',
-      tableLayout: 'fixed' as const // Force table to respect column widths
+      tableLayout: 'fixed' as const
     },
     cell: {
       overflow: 'hidden',
@@ -69,8 +69,8 @@ export function ContactsTable({
             <TableRow>
               <TableHead style={{ ...tableStyles.cell, width: columnWidths.id }}>Contact ID</TableHead>
               <TableHead style={{ ...tableStyles.cell, width: columnWidths.name }}>Name</TableHead>
-              <TableHead style={{ ...tableStyles.cell, width: columnWidths.industry }}>Industry</TableHead>
-              <TableHead style={{ ...tableStyles.cell, width: columnWidths.domain }}>Domain</TableHead>
+              <TableHead style={{ ...tableStyles.cell, width: columnWidths.email }}>Email</TableHead>
+              <TableHead style={{ ...tableStyles.cell, width: columnWidths.phone }}>Phone</TableHead>
               <TableHead style={{ ...tableStyles.cell, width: columnWidths.createdAt }}>Created At</TableHead>
               <TableHead style={{ ...tableStyles.cell, width: columnWidths.updatedAt }}>Updated At</TableHead>
             </TableRow>
@@ -91,11 +91,11 @@ export function ContactsTable({
                   <TableCell style={{ ...tableStyles.cell, width: columnWidths.name }}>
                     <Skeleton className="h-6 w-[150px]" />
                   </TableCell>
-                  <TableCell style={{ ...tableStyles.cell, width: columnWidths.industry }}>
-                    <Skeleton className="h-6 w-[120px]" />
-                  </TableCell>
-                  <TableCell style={{ ...tableStyles.cell, width: columnWidths.domain }}>
+                  <TableCell style={{ ...tableStyles.cell, width: columnWidths.email }}>
                     <Skeleton className="h-6 w-[180px]" />
+                  </TableCell>
+                  <TableCell style={{ ...tableStyles.cell, width: columnWidths.phone }}>
+                    <Skeleton className="h-6 w-[120px]" />
                   </TableCell>
                   <TableCell style={{ ...tableStyles.cell, width: columnWidths.createdAt }}>
                     <Skeleton className="h-6 w-[100px]" />
@@ -123,21 +123,11 @@ export function ContactsTable({
                   <TableCell style={{ ...tableStyles.cell, width: columnWidths.name }}>
                     {contact.name || "-"}
                   </TableCell>
-                  <TableCell style={{ ...tableStyles.cell, width: columnWidths.industry }}>
-                    {contact.fields?.industry || "-"}
+                  <TableCell style={{ ...tableStyles.cell, width: columnWidths.email }}>
+                    {contact.fields?.primaryEmail || "-"}
                   </TableCell>
-                  <TableCell style={{ ...tableStyles.cell, width: columnWidths.domain }}>
-                    {contact.fields?.domain ? (
-                      <a 
-                        href={contact.fields.domain.startsWith('http') ? contact.fields.domain : `http://${contact.fields.domain}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline"
-                        style={tableStyles.cell}
-                      >
-                        {contact.fields.domain}
-                      </a>
-                    ) : "-"}
+                  <TableCell style={{ ...tableStyles.cell, width: columnWidths.phone }}>
+                    {contact.fields?.primaryPhone || "-"}
                   </TableCell>
                   <TableCell style={{ ...tableStyles.cell, width: columnWidths.createdAt }}>
                     {formatDate(contact.createdTime || contact.created_at)}
