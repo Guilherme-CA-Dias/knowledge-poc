@@ -22,7 +22,7 @@ export function SyncButton({ integration }: SyncButtonProps) {
         const flowState = await integrationApp
           .connection(integration.connection.id)
           .flow('receive-contact-events')
-          .get()
+          .get({ autoCreate: true })
 
         setIsEnabled(flowState.enabled)
       } catch (error) {
@@ -63,7 +63,7 @@ export function SyncButton({ integration }: SyncButtonProps) {
       </Label>
       <div className="relative h-6 w-11 flex items-center">
         {isLoading ? (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center -ml-2">
             <Loader2 className="h-4 w-4 animate-spin" />
           </div>
         ) : (
