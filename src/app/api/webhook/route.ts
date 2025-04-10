@@ -3,7 +3,7 @@ import { connectToDatabase } from '@/lib/mongodb';
 import { Contact } from '@/models/contact';
 
 interface WebhookPayload {
-  customerId: string;
+  userId: string;
   data: {
     id: string | number;
     name?: string;
@@ -19,15 +19,16 @@ interface WebhookPayload {
 export async function POST(request: NextRequest) {
   try {
     const payload = await request.json() as WebhookPayload;
+    const customerId = payload.userId;
     console.log('Received webhook payload:', {
-      customerId: payload.customerId,
+      customerId,
       recordId: payload.data.id
     });
 
     await connectToDatabase();
 
     // Ensure we have the required fields
-    if (!payload.customerId || !payload.data.id) {
+    if (!customerId || !payload.data.id) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -37,7 +38,7 @@ export async function POST(request: NextRequest) {
     // Check for existing contact
     const existingContact = await Contact.findOne({
       id: payload.data.id.toString(),
-      customerId: payload.customerId
+      customerId
     });
 
     // Compare contacts to check if update is needed
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
       const newData = {
         ...payload.data,
         id: payload.data.id.toString(),
-        customerId: payload.customerId,
+        customerId,
         _id: undefined,
         __v: undefined,
         updatedTime: undefined
@@ -66,7 +67,7 @@ export async function POST(request: NextRequest) {
           success: true,
           contactId: payload.data.id,
           _id: existingContact._id,
-          customerId: payload.customerId,
+          customerId,
           status: 'unchanged'
         });
       }
@@ -76,13 +77,13 @@ export async function POST(request: NextRequest) {
     const result = await Contact.findOneAndUpdate(
       { 
         id: payload.data.id.toString(),
-        customerId: payload.customerId 
+        customerId 
       },
       {
         $set: {
           ...payload.data,
           id: payload.data.id.toString(),
-          customerId: payload.customerId,
+          customerId,
           updatedTime: new Date().toISOString()
         }
       },
@@ -95,7 +96,7 @@ export async function POST(request: NextRequest) {
     console.log('Contact updated:', {
       id: payload.data.id,
       _id: result._id,
-      customerId: payload.customerId,
+      customerId,
       status: existingContact ? 'updated' : 'created'
     });
 
@@ -103,10 +104,9 @@ export async function POST(request: NextRequest) {
       success: true,
       contactId: payload.data.id,
       _id: result._id,
-      customerId: payload.customerId,
+      customerId,
       status: existingContact ? 'updated' : 'created'
     });
-
   } catch (error) {
     console.error('Error processing webhook:', error);
     return NextResponse.json(
