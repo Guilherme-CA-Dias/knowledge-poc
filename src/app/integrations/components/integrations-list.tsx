@@ -10,7 +10,9 @@ export function IntegrationList() {
 
   const handleConnect = async (integration: IntegrationAppIntegration) => {
     try {
-      await integrationApp.integration(integration.key).openNewConnection()
+      await integrationApp
+        .integration(integration.key)
+        .openNewConnection()
       refresh()
     } catch (error) {
       console.error("Failed to connect:", error)
@@ -20,10 +22,24 @@ export function IntegrationList() {
   const handleDisconnect = async (integration: IntegrationAppIntegration) => {
     if (!integration.connection?.id) return
     try {
-      await integrationApp.connection(integration.connection.id).archive()
+      await integrationApp
+        .connection(integration.connection.id)
+        .archive()
       refresh()
     } catch (error) {
       console.error("Failed to disconnect:", error)
+    }
+  }
+
+  const handleOpenFieldMapping = async (integration: IntegrationAppIntegration) => {
+    if (!integration.connection?.id) return
+    try {
+      await integrationApp
+        .connection(integration.connection.id)
+        .fieldMapping('contacts')
+        .openConfiguration()      
+    } catch (error) {
+      console.error("Failed to open field mapping:", error)
     }
   }
 
@@ -56,6 +72,14 @@ export function IntegrationList() {
           {integration.connection?.id && (
             <div className="flex items-center space-x-6">
               <SyncButton integration={integration} />
+
+              <button
+                onClick={() => handleOpenFieldMapping(integration)}
+                className="px-4 py-2 rounded-md font-medium transition-colors bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 hover:text-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+              >
+                Field Mappings
+              </button>
+
               <button
                 onClick={() => handleDisconnect(integration)}
                 className="px-4 py-2 rounded-md font-medium transition-colors bg-red-100 text-red-700 dark:bg-red-700 dark:text-red-100 hover:bg-red-200 hover:text-red-800 dark:hover:bg-red-800 dark:hover:text-red-100"
