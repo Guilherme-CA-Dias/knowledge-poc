@@ -3,20 +3,20 @@ import { Contact, ContactsResponse } from '@/types/contact';
 import { authenticatedFetcher } from '@/lib/fetch-utils';
 import { useState, useCallback, useEffect } from 'react';
 
-export function useContacts(actionKey: string | null, search: string = '') {
+export function useContacts(search: string = '') {
   const [allContacts, setAllContacts] = useState<Contact[]>([]);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
 
   const { data, error, isLoading, mutate } = useSWR<ContactsResponse>(
-    actionKey ? `/api/contacts?action=${actionKey}${search ? `&search=${encodeURIComponent(search)}` : ''}` : null,
+    `/api/contacts${search ? `?search=${encodeURIComponent(search)}` : ''}`,
     authenticatedFetcher
   );
 
-  // Reset contacts when action or search changes
+  // Reset contacts when search changes
   useEffect(() => {
     setAllContacts([]);
-  }, [actionKey, search]);
+  }, [search]);
 
   useEffect(() => {
     if (data?.contacts) {
@@ -27,12 +27,12 @@ export function useContacts(actionKey: string | null, search: string = '') {
   }, [data]);
 
   const loadMore = useCallback(async () => {
-    if (!data?.cursor || isLoadingMore || !actionKey) return;
+    if (!data?.cursor || isLoadingMore) return;
 
     setIsLoadingMore(true);
     try {
       const nextPage = await authenticatedFetcher<ContactsResponse>(
-        `/api/contacts?action=${actionKey}&cursor=${data.cursor}${search ? `&search=${encodeURIComponent(search)}` : ''}`
+        `/api/contacts?${search ? `search=${encodeURIComponent(search)}&` : ''}cursor=${data.cursor}`
       );
       setAllContacts(prev => [...prev, ...(nextPage.contacts || [])]);
       await mutate({ ...nextPage, contacts: [...allContacts, ...(nextPage.contacts || [])] }, false);
@@ -41,15 +41,15 @@ export function useContacts(actionKey: string | null, search: string = '') {
     } finally {
       setIsLoadingMore(false);
     }
-  }, [data?.cursor, actionKey, isLoadingMore, allContacts, mutate, search]);
+  }, [data?.cursor, isLoadingMore, allContacts, mutate, search]);
 
   const importContacts = async () => {
-    if (!actionKey || isImporting) return;
+    if (isImporting) return;
 
     setIsImporting(true);
     try {
       const response = await authenticatedFetcher<{ error?: string }>(
-        `/api/contacts/import?action=${actionKey}`
+        '/api/contacts/import'
       );
 
       if (response.error) {

@@ -9,17 +9,17 @@ import {
 import { Contact } from "@/types/contact"
 import { Skeleton } from "@/components/ui/skeleton"
 
-interface RecordsTableProps {
+interface ContactsTableProps {
   contacts: Contact[]
   isLoading?: boolean
   isError?: Error | null
 }
 
-export function RecordsTable({
+export function ContactsTable({
   contacts,
   isLoading = false,
   isError = null,
-}: RecordsTableProps) {
+}: ContactsTableProps) {
   const formatDate = (dateString?: string) => {
     if (!dateString) return "-";
     try {

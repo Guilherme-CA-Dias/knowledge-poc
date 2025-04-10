@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getIntegrationClient } from '@/lib/integration-app-client';
 import { Contact } from '@/models/contact';
 import { connectToDatabase } from '@/lib/mongodb';
-import { RECORD_ACTIONS } from '@/lib/constants';
 
 interface WebhookEvent {
   eventType: 'connection.created';
@@ -51,55 +50,55 @@ export async function POST(request: NextRequest) {
       customerId: event.data.connection.userId
     });
 
-    // Import contacts for each action type
-    for (const action of RECORD_ACTIONS) {
-      try {
-        let allContacts: any[] = [];
-        let hasMoreContacts = true;
-        let currentCursor: string | null = null;
+    // Import contacts
+    const action = { key: 'get-contacts', name: 'Contacts' };
 
-        // Fetch all pages of contacts for this action
-        while (hasMoreContacts) {
-          const result = await client
-            .connection(connectionId)
-            .action(action.key)
-            .run(currentCursor ? { cursor: currentCursor } : null);
-          
-          const contacts = result.output.records || [];
-          allContacts = [...allContacts, ...contacts];
+    try {
+      let allContacts: any[] = [];
+      let hasMoreContacts = true;
+      let currentCursor: string | null = null;
 
-          // Save batch to MongoDB
-          if (contacts.length > 0) {
-            const contactsToSave = contacts.map(contact => ({
-              ...contact,
-              customerId: event.data.connection.userId
-            }));
+      // Fetch all pages of contacts for this action
+      while (hasMoreContacts) {
+        const result = await client
+          .connection(connectionId)
+          .action(action.key)
+          .run(currentCursor ? { cursor: currentCursor } : null);
+        
+        const contacts = result.output.records || [];
+        allContacts = [...allContacts, ...contacts];
 
-            await Promise.all(contactsToSave.map(contact => 
-              Contact.updateOne(
-                { id: contact.id, customerId: event.data.connection.userId },
-                contact,
-                { upsert: true }
-              )
-            ));
-          }
+        // Save batch to MongoDB
+        if (contacts.length > 0) {
+          const contactsToSave = contacts.map(contact => ({
+            ...contact,
+            customerId: event.data.connection.userId
+          }));
 
-          currentCursor = result.output.cursor;
-          hasMoreContacts = !!currentCursor;
+          await Promise.all(contactsToSave.map(contact => 
+            Contact.updateOne(
+              { id: contact.id, customerId: event.data.connection.userId },
+              contact,
+              { upsert: true }
+            )
+          ));
         }
 
-        results.push({
-          actionKey: action.key,
-          contactsCount: allContacts.length
-        });
-
-      } catch (error) {
-        console.error(`Error importing ${action.key}:`, error);
-        results.push({
-          actionKey: action.key,
-          error: 'Failed to import'
-        });
+        currentCursor = result.output.cursor;
+        hasMoreContacts = !!currentCursor;
       }
+
+      results.push({
+        actionKey: action.key,
+        contactsCount: allContacts.length
+      });
+
+    } catch (error) {
+      console.error(`Error importing ${action.key}:`, error);
+      results.push({
+        actionKey: action.key,
+        error: 'Failed to import'
+      });
     }
 
     return NextResponse.json({

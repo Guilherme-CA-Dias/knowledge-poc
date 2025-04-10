@@ -1,19 +1,15 @@
 "use client"
 
-import { RecordsTable } from "./components/records-table"
+import { ContactsTable } from "./components/contacts-table"
 import { useContacts } from "@/hooks/use-contacts"
 import { Button } from "@/components/ui/button"
 import { RefreshCw, Loader2, Search } from "lucide-react"
 import { useState } from "react"
-import { Select } from "@/components/ui/select"
-import { RecordActionKey, RECORD_ACTIONS } from "@/lib/constants"
 import { Input } from "@/components/ui/input"
 
 export default function RecordsPage() {
-  const [selectedAction, setSelectedAction] = useState<RecordActionKey | ''>('');
   const [searchQuery, setSearchQuery] = useState('');
   const { contacts, isLoading, hasMore, loadMore, importContacts, isImporting } = useContacts(
-    selectedAction || null,
     searchQuery
   );
 
@@ -29,19 +25,6 @@ export default function RecordsPage() {
 
       {/* Contact Type Selection and Search */}
       <div className="grid gap-6 md:grid-cols-[2fr,2fr,auto]">
-        <Select
-          value={selectedAction}
-          onChange={(e) => setSelectedAction(e.target.value as RecordActionKey)}
-          className="w-full"
-        >
-          <option value="">Select contact type</option>
-          {RECORD_ACTIONS.map((action) => (
-            <option key={action.key} value={action.key}>
-              {action.name}
-            </option>
-          ))}
-        </Select>
-
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500 dark:text-gray-400" />
           <Input
@@ -54,7 +37,8 @@ export default function RecordsPage() {
 
         <Button 
           onClick={() => importContacts()} 
-          disabled={!selectedAction || isImporting}
+          disabled={isImporting}
+          className="w-fit"
         >
           {isImporting ? (
             <>
@@ -72,7 +56,7 @@ export default function RecordsPage() {
 
       {/* Contacts Table */}
       <div className="mt-6">
-        <RecordsTable 
+        <ContactsTable 
           contacts={contacts}
           isLoading={isLoading}
           hasMore={hasMore}

@@ -3,7 +3,6 @@ import { getAuthFromRequest } from '@/lib/server-auth';
 import { getIntegrationClient } from '@/lib/integration-app-client';
 import { Contact } from '@/models/contact';
 import { connectToDatabase } from '@/lib/mongodb';
-import { RecordActionKey } from '@/lib/constants';
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,16 +11,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
-      );
-    }
-
-    const searchParams = request.nextUrl.searchParams;
-    const actionKey = searchParams.get('action') as RecordActionKey;
-
-    if (!actionKey) {
-      return NextResponse.json(
-        { error: 'Action key is required' },
-        { status: 400 }
       );
     }
 
@@ -44,7 +33,7 @@ export async function GET(request: NextRequest) {
       
       const result = await client
         .connection(firstConnection.id)
-        .action(actionKey)
+        .action('get-contacts')
         .run(currentCursor ? { cursor: currentCursor } : null);
 
       const contacts = result.output.records || [];

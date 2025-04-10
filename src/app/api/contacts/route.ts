@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthFromRequest } from '@/lib/server-auth';
 import { Contact } from '@/models/contact';
 import { connectToDatabase } from '@/lib/mongodb';
-import { RecordActionKey } from '@/lib/constants';
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,16 +16,8 @@ export async function GET(request: NextRequest) {
     }
 
     const searchParams = request.nextUrl.searchParams;
-    const action = searchParams.get('action') as RecordActionKey;
     const cursor = searchParams.get('cursor');
     const search = searchParams.get('search');
-
-    if (!action) {
-      return NextResponse.json(
-        { error: 'Action is required' },
-        { status: 400 }
-      );
-    }
 
     // Connect to MongoDB and fetch contacts
     await connectToDatabase();
