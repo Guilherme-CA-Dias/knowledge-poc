@@ -24,12 +24,12 @@ export default function RecordsPage() {
       </div>
 
       {/* Contact Type Selection and Search */}
-      <div className="grid gap-6 md:grid-cols-[2fr,2fr,auto]">
-        <div className="relative">
+      <div className="grid gap-6 md:grid-cols-[1fr,auto,auto]">
+        <div className="relative w-full">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500 dark:text-gray-400" />
           <Input
             placeholder="Search contacts..."
-            className="pl-10"
+            className="pl-10 w-full"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
