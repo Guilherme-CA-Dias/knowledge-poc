@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Select } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -25,7 +25,19 @@ export default function LookupPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [editedContact, setEditedContact] = useState<Contact | null>(null)
   const [hasSearched, setHasSearched] = useState(false)
+  const [firstConnection, setFirstConnection] = useState<{ id: string, name: string } | null>(null)
   const integrationApp = useIntegrationApp()
+
+  // Fetch first connection on mount
+  useEffect(() => {
+    const fetchConnection = async () => {
+      const connections = await integrationApp.connections.find()
+      if (connections.items?.[0]) {
+        setFirstConnection(connections.items[0])
+      }
+    }
+    fetchConnection()
+  }, [integrationApp])
 
   const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setLookupType(e.target.value as LookupType)
@@ -47,9 +59,6 @@ export default function LookupPage() {
       setEditedContact(null)
       setHasSearched(true)
 
-      const connections = await integrationApp.connections.find()
-      const firstConnection = connections.items?.[0]
-      
       if (!firstConnection) {
         setResult({ error: "No connection found" })
         return
@@ -84,7 +93,12 @@ export default function LookupPage() {
 
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-6">Contact Lookup</h1>
+      <h1 className="text-2xl font-bold mb-2">Contact Lookup</h1>
+      {firstConnection && (
+        <p className="text-sm text-gray-500 mb-6">
+          Using first connection found: {firstConnection.name}
+        </p>
+      )}
       
       <div className="flex gap-4 items-end max-w-2xl">
         <div className="flex-1">
