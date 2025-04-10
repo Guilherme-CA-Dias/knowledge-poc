@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthFromRequest } from '@/lib/server-auth';
 import { getIntegrationClient } from '@/lib/integration-app-client';
-import { Record } from '@/models/record';
+import { Contact } from '@/models/contact';
 import { connectToDatabase } from '@/lib/mongodb';
 import { RecordActionKey } from '@/lib/constants';
 
@@ -34,55 +34,54 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'No connection found' });
     }
 
-    let allRecords = [];
-    let hasMoreRecords = true;
+    let allContacts = [];
+    let hasMoreContacts = true;
     let currentCursor = null;
 
-    // Keep fetching while there are more records
-    while (hasMoreRecords) {
-      console.log(`Fetching records with cursor: ${currentCursor}`);
+    // Keep fetching while there are more contacts
+    while (hasMoreContacts) {
+      console.log(`Fetching contacts with cursor: ${currentCursor}`);
       
       const result = await client
         .connection(firstConnection.id)
         .action(actionKey)
         .run(currentCursor ? { cursor: currentCursor } : null);
 
-      const records = result.output.records || [];
-      allRecords = [...allRecords, ...records];
+      const contacts = result.output.records || [];
+      allContacts = [...allContacts, ...contacts];
 
       // Save batch to MongoDB
-      if (records.length > 0) {
-        const recordsToSave = records.map(record => ({
-          ...record,
-          customerId: auth.customerId,
-          recordType: actionKey,
+      if (contacts.length > 0) {
+        const contactsToSave = contacts.map(contact => ({
+          ...contact,
+          customerId: auth.customerId
         }));
 
-        await Promise.all(recordsToSave.map(record => 
-          Record.updateOne(
-            { id: record.id, customerId: auth.customerId },
-            record,
+        await Promise.all(contactsToSave.map(contact => 
+          Contact.updateOne(
+            { id: contact.id, customerId: auth.customerId },
+            contact,
             { upsert: true }
           )
         ));
 
-        console.log(`Saved ${records.length} records to MongoDB`);
+        console.log(`Saved ${contacts.length} contacts to MongoDB`);
       }
 
-      // Check if there are more records to fetch
+      // Check if there are more contacts to fetch
       currentCursor = result.output.cursor;
-      hasMoreRecords = !!currentCursor;
+      hasMoreContacts = !!currentCursor;
 
-      if (hasMoreRecords) {
-        console.log('More records available, continuing to next page...');
+      if (hasMoreContacts) {
+        console.log('More contacts available, continuing to next page...');
       }
     }
 
-    console.log(`Import completed. Total records: ${allRecords.length}`);
+    console.log(`Import completed. Total contacts: ${allContacts.length}`);
 
     return NextResponse.json({ 
       success: true,
-      recordsCount: allRecords.length 
+      contactsCount: allContacts.length 
     });
   } catch (error) {
     console.error('Error in import:', error);

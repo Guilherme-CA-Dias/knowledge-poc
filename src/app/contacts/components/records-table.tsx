@@ -6,17 +6,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Record } from "@/types/record"
+import { Contact } from "@/types/contact"
 import { Skeleton } from "@/components/ui/skeleton"
 
 interface RecordsTableProps {
-  records: Record[]
+  contacts: Contact[]
   isLoading?: boolean
   isError?: Error | null
 }
 
 export function RecordsTable({
-  records,
+  contacts,
   isLoading = false,
   isError = null,
 }: RecordsTableProps) {
@@ -33,7 +33,7 @@ export function RecordsTable({
     return (
       <div className="rounded-md border p-8 text-center">
         <p className="text-muted-foreground">
-          Error loading records. Please try again later.
+          Error loading contacts. Please try again later.
         </p>
       </div>
     )
@@ -67,7 +67,7 @@ export function RecordsTable({
         <Table style={tableStyles.table}>
           <TableHeader>
             <TableRow>
-              <TableHead style={{ ...tableStyles.cell, width: columnWidths.id }}>Record ID</TableHead>
+              <TableHead style={{ ...tableStyles.cell, width: columnWidths.id }}>Contact ID</TableHead>
               <TableHead style={{ ...tableStyles.cell, width: columnWidths.name }}>Name</TableHead>
               <TableHead style={{ ...tableStyles.cell, width: columnWidths.industry }}>Industry</TableHead>
               <TableHead style={{ ...tableStyles.cell, width: columnWidths.domain }}>Domain</TableHead>
@@ -105,45 +105,45 @@ export function RecordsTable({
                   </TableCell>
                 </TableRow>
               ))
-            ) : records.length === 0 ? (
+            ) : contacts.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={6}
                   className="text-center text-muted-foreground h-[400px]"
                 >
-                  No records found
+                  No contacts found
                 </TableCell>
               </TableRow>
             ) : (
-              records.map((record) => (
-                <TableRow key={`${record.id}-${record.customerId}`}>
+              contacts.map((contact) => (
+                <TableRow key={`${contact.id}-${contact.customerId}`}>
                   <TableCell style={{ ...tableStyles.cell, width: columnWidths.id }} className="font-medium">
-                    {record.id}
+                    {contact.id}
                   </TableCell>
                   <TableCell style={{ ...tableStyles.cell, width: columnWidths.name }}>
-                    {record.name || "-"}
+                    {contact.name || "-"}
                   </TableCell>
                   <TableCell style={{ ...tableStyles.cell, width: columnWidths.industry }}>
-                    {record.fields?.industry || "-"}
+                    {contact.fields?.industry || "-"}
                   </TableCell>
                   <TableCell style={{ ...tableStyles.cell, width: columnWidths.domain }}>
-                    {record.fields?.domain ? (
+                    {contact.fields?.domain ? (
                       <a 
-                        href={record.fields.domain.startsWith('http') ? record.fields.domain : `http://${record.fields.domain}`}
+                        href={contact.fields.domain.startsWith('http') ? contact.fields.domain : `http://${contact.fields.domain}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:underline"
                         style={tableStyles.cell}
                       >
-                        {record.fields.domain}
+                        {contact.fields.domain}
                       </a>
                     ) : "-"}
                   </TableCell>
                   <TableCell style={{ ...tableStyles.cell, width: columnWidths.createdAt }}>
-                    {formatDate(record.createdTime || record.created_at)}
+                    {formatDate(contact.createdTime || contact.created_at)}
                   </TableCell>
                   <TableCell style={{ ...tableStyles.cell, width: columnWidths.updatedAt }}>
-                    {formatDate(record.updatedTime || record.updated_at)}
+                    {formatDate(contact.updatedTime || contact.updated_at)}
                   </TableCell>
                 </TableRow>
               ))
@@ -152,5 +152,5 @@ export function RecordsTable({
         </Table>
       </div>
     </div>
-  )
+  );
 } 

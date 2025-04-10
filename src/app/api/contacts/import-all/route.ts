@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getIntegrationClient } from '@/lib/integration-app-client';
-import { Record } from '@/models/record';
+import { Contact } from '@/models/contact';
 import { connectToDatabase } from '@/lib/mongodb';
 import { RECORD_ACTIONS } from '@/lib/constants';
 
@@ -42,79 +42,55 @@ interface WebhookEvent {
 
 export async function POST(request: NextRequest) {
   try {
-    // Log the raw request body
-    const rawBody = await request.text();
-    console.log('Raw webhook payload:', rawBody);
-
-    // Parse the JSON after logging
-    const event = JSON.parse(rawBody) as WebhookEvent;
-    
-    console.log('Parsed webhook event:', {
-      eventType: event.eventType,
-      connectionId: event.data.connection.id,
-      userId: event.data.connection.userId,
-      userName: event.data.connection.user.name,
-      integrationKey: event.data.connection.integration.key,
-      timestamp: new Date().toISOString()
-    });
-
-    if (event.eventType !== 'connection.created') {
-      return NextResponse.json(
-        { error: 'Invalid event type' },
-        { status: 400 }
-      );
-    }
+    const event = await request.json() as WebhookEvent;
+    const connectionId = event.data.connection.id;
+    const results: Array<{ actionKey: string; contactsCount?: number; error?: string }> = [];
 
     await connectToDatabase();
-    const client = await getIntegrationClient({ 
-      customerId: event.data.connection.userId,
-      customerName: event.data.connection.user.name 
+    const client = await getIntegrationClient({
+      customerId: event.data.connection.userId
     });
-    const results = [];
 
-    const connectionId = event.data.connection.id;
-
-    // Import records for each action type
+    // Import contacts for each action type
     for (const action of RECORD_ACTIONS) {
       try {
-        let allRecords: any[] = [];
-        let hasMoreRecords = true;
+        let allContacts: any[] = [];
+        let hasMoreContacts = true;
         let currentCursor: string | null = null;
 
-        // Fetch all pages of records for this action
-        while (hasMoreRecords) {
+        // Fetch all pages of contacts for this action
+        while (hasMoreContacts) {
           const result = await client
             .connection(connectionId)
             .action(action.key)
             .run(currentCursor ? { cursor: currentCursor } : null);
           
-          const records = result.output.records || [];
-          allRecords = [...allRecords, ...records];
+          const contacts = result.output.records || [];
+          allContacts = [...allContacts, ...contacts];
 
           // Save batch to MongoDB
-          if (records.length > 0) {
-            const recordsToSave = records.map(record => ({
-              ...record,
-              customerId: event.data.connection.userId,
-              recordType: action.key,
+          if (contacts.length > 0) {
+            const contactsToSave = contacts.map(contact => ({
+              ...contact,
+              customerId: event.data.connection.userId
             }));
 
-            await Promise.all(recordsToSave.map(record => 
-              Record.updateOne(
-                { id: record.id, customerId: event.data.connection.userId },
-                record,
+            await Promise.all(contactsToSave.map(contact => 
+              Contact.updateOne(
+                { id: contact.id, customerId: event.data.connection.userId },
+                contact,
                 { upsert: true }
               )
             ));
           }
 
           currentCursor = result.output.cursor;
-          hasMoreRecords = !!currentCursor;
+          hasMoreContacts = !!currentCursor;
         }
 
         results.push({
           actionKey: action.key,
-          recordsCount: allRecords.length
+          contactsCount: allContacts.length
         });
 
       } catch (error) {

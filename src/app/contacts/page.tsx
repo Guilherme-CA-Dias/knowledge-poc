@@ -1,7 +1,7 @@
 "use client"
 
 import { RecordsTable } from "./components/records-table"
-import { useRecords } from "@/hooks/use-records"
+import { useContacts } from "@/hooks/use-contacts"
 import { Button } from "@/components/ui/button"
 import { RefreshCw, Loader2, Search } from "lucide-react"
 import { useState } from "react"
@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input"
 export default function RecordsPage() {
   const [selectedAction, setSelectedAction] = useState<RecordActionKey | ''>('');
   const [searchQuery, setSearchQuery] = useState('');
-  const { records, isLoading, hasMore, loadMore, importRecords, isImporting } = useRecords(
+  const { contacts, isLoading, hasMore, loadMore, importContacts, isImporting } = useContacts(
     selectedAction || null,
     searchQuery
   );
@@ -21,20 +21,20 @@ export default function RecordsPage() {
     <div className="container mx-auto py-10 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Records</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Contacts</h1>
         <p className="text-muted-foreground mt-2">
-          Select a record type to view and manage your records
+          Select a contact type to view and manage your contacts
         </p>
       </div>
 
-      {/* Record Type Selection and Search */}
+      {/* Contact Type Selection and Search */}
       <div className="grid gap-6 md:grid-cols-[2fr,2fr,auto]">
         <Select
           value={selectedAction}
           onChange={(e) => setSelectedAction(e.target.value as RecordActionKey)}
           className="w-full"
         >
-          <option value="">Select record type</option>
+          <option value="">Select contact type</option>
           {RECORD_ACTIONS.map((action) => (
             <option key={action.key} value={action.key}>
               {action.name}
@@ -45,7 +45,7 @@ export default function RecordsPage() {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500 dark:text-gray-400" />
           <Input
-            placeholder="Search records..."
+            placeholder="Search contacts..."
             className="pl-10"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -53,7 +53,7 @@ export default function RecordsPage() {
         </div>
 
         <Button 
-          onClick={() => importRecords()} 
+          onClick={() => importContacts()} 
           disabled={!selectedAction || isImporting}
         >
           {isImporting ? (
@@ -64,16 +64,16 @@ export default function RecordsPage() {
           ) : (
             <>
               <RefreshCw className="mr-2 h-4 w-4" />
-              Import Records
+              Import Contacts
             </>
           )}
         </Button>
       </div>
 
-      {/* Records Table */}
+      {/* Contacts Table */}
       <div className="mt-6">
         <RecordsTable 
-          records={records}
+          contacts={contacts}
           isLoading={isLoading}
           hasMore={hasMore}
           onLoadMore={loadMore}

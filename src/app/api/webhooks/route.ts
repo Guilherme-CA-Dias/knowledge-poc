@@ -1,21 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
-import { Record } from '@/models/record';
-import { RecordActionKey } from '@/lib/constants';
+import { Contact } from '@/models/contact';
 
 interface WebhookPayload {
   customerId: string;
-  recordType: RecordActionKey;
   data: {
     id: string | number;
     name?: string;
     fields?: {
-      [key: string]: any;
+      [key: string]: string | number | boolean | null | undefined;
     };
     createdTime?: string;
     updatedTime?: string;
-    // Any other fields that might come
-    [key: string]: any;
+    [key: string]: string | number | boolean | null | undefined | Record<string, string | number | boolean | null | undefined>;
   };
 }
 
@@ -24,31 +21,30 @@ export async function POST(request: NextRequest) {
     const payload = await request.json() as WebhookPayload;
     console.log('Received webhook payload:', {
       customerId: payload.customerId,
-      recordId: payload.data.id,
-      recordType: payload.recordType
+      recordId: payload.data.id
     });
 
     await connectToDatabase();
 
     // Ensure we have the required fields
-    if (!payload.customerId || !payload.data.id || !payload.recordType) {
+    if (!payload.customerId || !payload.data.id) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       );
     }
 
-    // Check for existing record
-    const existingRecord = await Record.findOne({
+    // Check for existing contact
+    const existingContact = await Contact.findOne({
       id: payload.data.id.toString(),
       customerId: payload.customerId
     });
 
-    // Compare records to check if update is needed
-    if (existingRecord) {
-      // Convert both records to comparable objects
+    // Compare contacts to check if update is needed
+    if (existingContact) {
+      // Convert both contacts to comparable objects
       const existingData = {
-        ...existingRecord.toObject(),
+        ...existingContact.toObject(),
         _id: undefined, // Exclude MongoDB _id from comparison
         __v: undefined, // Exclude version from comparison
         updatedTime: undefined // Exclude updatedTime from comparison
@@ -58,7 +54,6 @@ export async function POST(request: NextRequest) {
         ...payload.data,
         id: payload.data.id.toString(),
         customerId: payload.customerId,
-        recordType: payload.recordType,
         _id: undefined,
         __v: undefined,
         updatedTime: undefined
@@ -66,20 +61,19 @@ export async function POST(request: NextRequest) {
 
       // Only update if data has changed
       if (JSON.stringify(existingData) === JSON.stringify(newData)) {
-        console.log('Record unchanged, skipping update:', payload.data.id);
+        console.log('Contact unchanged, skipping update:', payload.data.id);
         return NextResponse.json({ 
           success: true,
-          recordId: payload.data.id,
-          _id: existingRecord._id,
+          contactId: payload.data.id,
+          _id: existingContact._id,
           customerId: payload.customerId,
-          recordType: payload.recordType,
           status: 'unchanged'
         });
       }
     }
 
-    // Update or insert the record
-    const result = await Record.findOneAndUpdate(
+    // Update or insert the contact
+    const result = await Contact.findOneAndUpdate(
       { 
         id: payload.data.id.toString(),
         customerId: payload.customerId 
@@ -89,7 +83,6 @@ export async function POST(request: NextRequest) {
           ...payload.data,
           id: payload.data.id.toString(),
           customerId: payload.customerId,
-          recordType: payload.recordType,
           updatedTime: new Date().toISOString()
         }
       },
@@ -99,21 +92,19 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    console.log('Record updated:', {
+    console.log('Contact updated:', {
       id: payload.data.id,
       _id: result._id,
       customerId: payload.customerId,
-      recordType: payload.recordType,
-      status: existingRecord ? 'updated' : 'created'
+      status: existingContact ? 'updated' : 'created'
     });
 
     return NextResponse.json({ 
       success: true,
-      recordId: payload.data.id,
+      contactId: payload.data.id,
       _id: result._id,
       customerId: payload.customerId,
-      recordType: payload.recordType,
-      status: existingRecord ? 'updated' : 'created'
+      status: existingContact ? 'updated' : 'created'
     });
 
   } catch (error) {

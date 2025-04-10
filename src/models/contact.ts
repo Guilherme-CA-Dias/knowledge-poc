@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-export interface IRecord {
+export interface IContact {
   id: string;
   name: string;
   createdTime?: string;
@@ -11,14 +11,13 @@ export interface IRecord {
     industry?: string;
     [key: string]: any;
   };
-  recordType: string;
   customerId: string;
 }
 
 // Specify the database name
 const dbName = 'local-deployments';
 
-const recordSchema = new mongoose.Schema<IRecord>(
+const contactSchema = new mongoose.Schema<IContact>(
   {
     id: {
       type: String,
@@ -36,11 +35,6 @@ const recordSchema = new mongoose.Schema<IRecord>(
       of: mongoose.Schema.Types.Mixed,
       default: {},
     },
-    recordType: {
-      type: String,
-      required: true,
-      index: true,
-    },
     customerId: {
       type: String,
       required: true,
@@ -52,11 +46,8 @@ const recordSchema = new mongoose.Schema<IRecord>(
   }
 );
 
-// Compound index for efficient queries
-recordSchema.index({ customerId: 1, recordType: 1 });
-
 // Connect to the specific database
 const connection = mongoose.connection.useDb(dbName);
 
-// This creates a 'records' collection in the local-deployments database
-export const Record = connection.models.Record || connection.model<IRecord>('Record', recordSchema); 
+// This creates a 'contacts' collection in the local-deployments database
+export const Contact = connection.models.Contact || connection.model<IContact>('Contact', contactSchema); 

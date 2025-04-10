@@ -1,4 +1,4 @@
-export interface Record {
+export interface Contact {
   id: string;
   customerId: string;
   name: string;
@@ -12,10 +12,9 @@ export interface Record {
     industry?: string;
     [key: string]: any;
   };
-  recordType: string;
 }
 
-export interface RecordsResponse {
-  records: Record[];
+export interface ContactsResponse {
+  contacts: Contact[];
   cursor?: string;
 } 
