@@ -63,12 +63,12 @@ export function SyncButton({ integration }: SyncButtonProps) {
 
   return (
     <TooltipProvider>
-      <Tooltip delayDuration={0}>
+      <Tooltip delayDuration={100}>
         <TooltipTrigger asChild>
           <Button
             onClick={handleToggle}
             disabled={isLoading}
-            variant="ghost"
+            variant="outline"
             className="relative min-w-[120px]"
           >
             {isLoading ? (
@@ -81,7 +81,7 @@ export function SyncButton({ integration }: SyncButtonProps) {
                   }`}
                 />
                 <span className="ml-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200">
-                  {isEnabled ? "Disable Sync" : "Enable Sync"}
+                  {isEnabled ? "Disable Events Flow" : "Enable Events Flow"}
                 </span>
               </>
             )}
@@ -89,8 +89,8 @@ export function SyncButton({ integration }: SyncButtonProps) {
         </TooltipTrigger>
         <TooltipContent>
           {isEnabled
-            ? "Syncing is enabled. Click to disable"
-            : "Syncing is disabled. Click to enable"}
+            ? "Continuous import is enabled. Click to disable"
+            : "Continuous import is disabled. Click to enable"}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
