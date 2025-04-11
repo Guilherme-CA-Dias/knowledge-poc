@@ -11,6 +11,7 @@ type Contact = {
   firstName?: string
   lastName?: string
   primaryEmail?: string
+  primaryPhone?: string
   [key: string]: unknown
 }
 type LookupResult = {
@@ -23,6 +24,8 @@ export default function LookupPage() {
   const [lookupValue, setLookupValue] = useState("")
   const [result, setResult] = useState<LookupResult | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [isUpdating, setIsUpdating] = useState(false)
+  const [updateSuccess, setUpdateSuccess] = useState(false)
   const [editedContact, setEditedContact] = useState<Contact | null>(null)
   const [hasSearched, setHasSearched] = useState(false)
   const [firstConnection, setFirstConnection] = useState<{ id: string, name: string } | null>(null)
@@ -91,12 +94,45 @@ export default function LookupPage() {
     setEditedContact({ ...editedContact, [field]: value })
   }
 
+  const handleUpdate = async () => {
+    if (!editedContact) return
+
+    if (!firstConnection) {
+      setResult({ error: "No connection found" })
+      return
+    }
+
+    setIsUpdating(true)
+    setUpdateSuccess(false)
+    
+    try {
+      const response = await integrationApp
+        .connection(firstConnection.id)
+        .action("update-contact")
+        .run({
+            id: editedContact.id,
+            data: {
+              firstName: editedContact.firstName,
+              lastName: editedContact.lastName,
+              primaryEmail: editedContact.primaryEmail,
+              primaryPhone: editedContact.primaryPhone
+            }
+        });
+      console.log('Update contact response:', response)
+      setUpdateSuccess(true)
+    } catch (error) {
+      setResult({ error: String(error) })
+    } finally {
+      setIsUpdating(false)
+    }
+  }
+
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-2xl font-bold mb-2">Contact Lookup</h1>
       {firstConnection && (
         <p className="text-sm text-gray-500 mb-6">
-          Using first connection found: {firstConnection.name}
+          Using: {firstConnection.name}
         </p>
       )}
       
@@ -167,6 +203,23 @@ export default function LookupPage() {
                 placeholder="Email"
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Phone</label>
+              <Input
+                type="tel"
+                value={editedContact.primaryPhone || ""}
+                onChange={(e) => handleContactChange("primaryPhone", e.target.value)}
+                placeholder="Phone Number"
+              />
+            </div>
+          </div>
+          <div className="mt-6">
+            <Button onClick={handleUpdate} disabled={isUpdating}>
+              {isUpdating ? 'Updating...' : 'Update Contact'}
+            </Button>
+            {updateSuccess && (
+              <p className="mt-2 text-green-600 text-sm">Contact updated successfully!</p>
+            )}
           </div>
         </div>
       )}
