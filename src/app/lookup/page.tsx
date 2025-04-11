@@ -139,7 +139,7 @@ export default function LookupPage() {
         </p>
       )}
       
-      <div className="flex gap-4 items-end max-w-2xl">
+      <div className="flex gap-4 items-center max-w-2xl">
         <div className="flex-1">
           <Select 
             value={lookupType}
