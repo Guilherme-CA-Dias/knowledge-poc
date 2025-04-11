@@ -2,7 +2,7 @@
 
 import { useIntegrationApp, useIntegrations } from "@integration-app/react"
 import type { Integration as IntegrationAppIntegration } from "@integration-app/sdk"
-import { SyncButton } from "./sync-button"
+import { FlowToggle } from "./flow-toggle"
 
 export function IntegrationList() {
   const integrationApp = useIntegrationApp()
@@ -71,7 +71,11 @@ export function IntegrationList() {
           </div>
           {integration.connection?.id && (
             <div className="flex items-center space-x-6">
-              <SyncButton integration={integration} />
+              <FlowToggle
+                flowSelector="receive-contact-events"
+                label="Continuous Import"
+                integration={integration}
+              />
 
               <button
                 onClick={() => handleOpenFieldMapping(integration)}

@@ -7,9 +7,11 @@ import { Loader2 } from "lucide-react"
 
 interface SyncButtonProps {
   integration: IntegrationAppIntegration
+  label: string
+  flowSelector: string
 }
 
-export function SyncButton({ integration }: SyncButtonProps) {
+export function FlowToggle({ integration, label, flowSelector }: SyncButtonProps) {
   const integrationApp = useIntegrationApp()
   const [isEnabled, setIsEnabled] = useState<boolean | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -21,7 +23,7 @@ export function SyncButton({ integration }: SyncButtonProps) {
       try {
         const flowState = await integrationApp
           .connection(integration.connection.id)
-          .flow('receive-contact-events')
+          .flow(flowSelector)
           .get({ autoCreate: true })
 
         setIsEnabled(flowState.enabled)
@@ -34,7 +36,7 @@ export function SyncButton({ integration }: SyncButtonProps) {
     }
 
     fetchFlowState()
-  }, [integration.connection?.id, integration.name, integrationApp])
+  }, [integration.connection?.id, integration.name, integrationApp, flowSelector])
 
   const handleToggle = async () => {
     if (!integration.connection?.id || isLoading) return
@@ -43,7 +45,7 @@ export function SyncButton({ integration }: SyncButtonProps) {
     try {
       await integrationApp
         .connection(integration.connection.id)
-        .flow('receive-contact-events')
+        .flow(flowSelector)
         .patch({ enabled: !isEnabled })
 
       setIsEnabled(!isEnabled)
@@ -59,7 +61,7 @@ export function SyncButton({ integration }: SyncButtonProps) {
   return (
     <div className="flex items-center space-x-2">
       <Label htmlFor="continuous-import" className="text-sm font-medium">
-        Continuous Import
+        {label}
       </Label>
       <div className="relative h-6 w-11 flex items-center">
         {isLoading ? (
