@@ -124,10 +124,10 @@ export function ContactsTable({
                     {contact.name || "-"}
                   </TableCell>
                   <TableCell style={{ ...tableStyles.cell, width: columnWidths.email }}>
-                    {contact.fields?.primaryEmail || "-"}
+                    {contact.fields?.email || "-"}
                   </TableCell>
                   <TableCell style={{ ...tableStyles.cell, width: columnWidths.phone }}>
-                    {contact.fields?.primaryPhone || "-"}
+                    {contact.fields?.phone || "-"}
                   </TableCell>
                   <TableCell style={{ ...tableStyles.cell, width: columnWidths.createdAt }}>
                     {formatDate(contact.createdTime || contact.created_at)}

@@ -8,10 +8,10 @@ import { useIntegrationApp } from "@integration-app/react"
 
 type LookupType = "phone" | "email"
 type Contact = {
-  firstName?: string
-  lastName?: string
-  primaryEmail?: string
-  primaryPhone?: string
+  first_name?: string
+  last_name?: string
+  email?: string
+  phone?: string
   fullName?: string
   [key: string]: unknown
 }
@@ -73,7 +73,7 @@ export default function LookupPage() {
         : "find-contact-by-email"
 
       const params = lookupType === "phone"
-        ? { phoneNumber: lookupValue }
+        ? { phone: lookupValue }
         : { email: lookupValue }
 
       const response = await integrationApp
@@ -109,18 +109,17 @@ export default function LookupPage() {
     setUpdateSuccess(false)
     
     try {
+      console.log('Updating contact:', editedContact)
+
       const response = await integrationApp
         .connection(firstConnection.id)
         .action("update-contact")
         .run({
             id: editedContact.id,
-            data: {
-              firstName: editedContact.firstName,
-              lastName: editedContact.lastName,
-              primaryEmail: editedContact.primaryEmail,
-              primaryPhone: editedContact.primaryPhone,
-              fullName: editedContact.fullName
-            }
+            first_name: editedContact.first_name,
+            last_name: editedContact.last_name,
+            email: editedContact.email,
+            phone: editedContact.phone,
         });
       console.log('Update contact response:', response)
       setUpdateSuccess(true)
@@ -183,26 +182,18 @@ export default function LookupPage() {
           <h2 className="text-xl font-semibold mb-4">Contact Details</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Full Name</label>
-              <Input
-                value={editedContact.fullName || ""}
-                onChange={(e) => handleContactChange("fullName", e.target.value)}
-                placeholder="Full Name"
-              />
-            </div>
-            <div>
               <label className="block text-sm font-medium mb-2">First Name</label>
               <Input
-                value={editedContact.firstName || ""}
-                onChange={(e) => handleContactChange("firstName", e.target.value)}
+                value={editedContact.first_name || ""}
+                onChange={(e) => handleContactChange("first_name", e.target.value)}
                 placeholder="First Name"
               />
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">Last Name</label>
               <Input
-                value={editedContact.lastName || ""}
-                onChange={(e) => handleContactChange("lastName", e.target.value)}
+                value={editedContact.last_name || ""}
+                onChange={(e) => handleContactChange("last_name", e.target.value)}
                 placeholder="Last Name"
               />
             </div>
@@ -210,8 +201,8 @@ export default function LookupPage() {
               <label className="block text-sm font-medium mb-2">Email</label>
               <Input
                 type="email"
-                value={editedContact.primaryEmail || ""}
-                onChange={(e) => handleContactChange("primaryEmail", e.target.value)}
+                value={editedContact.email || ""}
+                onChange={(e) => handleContactChange("email", e.target.value)}
                 placeholder="Email"
               />
             </div>
@@ -219,8 +210,8 @@ export default function LookupPage() {
               <label className="block text-sm font-medium mb-2">Phone</label>
               <Input
                 type="tel"
-                value={editedContact.primaryPhone || ""}
-                onChange={(e) => handleContactChange("primaryPhone", e.target.value)}
+                value={editedContact.phone || ""}
+                onChange={(e) => handleContactChange("phone", e.target.value)}
                 placeholder="Phone Number"
               />
             </div>
