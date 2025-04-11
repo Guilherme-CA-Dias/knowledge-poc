@@ -12,6 +12,7 @@ type Contact = {
   lastName?: string
   primaryEmail?: string
   primaryPhone?: string
+  fullName?: string
   [key: string]: unknown
 }
 type LookupResult = {
@@ -80,6 +81,8 @@ export default function LookupPage() {
         .action(action)
         .run(params)
 
+      console.log('Lookup response:', response)
+
       const contact = response?.output?.fields as Contact
       setEditedContact(contact)
     } catch (error) {
@@ -115,7 +118,8 @@ export default function LookupPage() {
               firstName: editedContact.firstName,
               lastName: editedContact.lastName,
               primaryEmail: editedContact.primaryEmail,
-              primaryPhone: editedContact.primaryPhone
+              primaryPhone: editedContact.primaryPhone,
+              fullName: editedContact.fullName
             }
         });
       console.log('Update contact response:', response)
@@ -178,6 +182,14 @@ export default function LookupPage() {
         <div className="mt-8 max-w-2xl">
           <h2 className="text-xl font-semibold mb-4">Contact Details</h2>
           <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">Full Name</label>
+              <Input
+                value={editedContact.fullName || ""}
+                onChange={(e) => handleContactChange("fullName", e.target.value)}
+                placeholder="Full Name"
+              />
+            </div>
             <div>
               <label className="block text-sm font-medium mb-2">First Name</label>
               <Input
