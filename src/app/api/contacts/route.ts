@@ -33,8 +33,8 @@ export async function GET(request: NextRequest) {
       query.$or = [
         { id: searchRegex },
         { name: searchRegex },
-        { 'fields.industry': searchRegex },
-        { 'fields.domain': searchRegex }
+        { 'fields.primaryEmail': searchRegex },
+        { 'fields.primaryPhone': searchRegex },
       ];
     }
 
