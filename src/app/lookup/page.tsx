@@ -177,55 +177,60 @@ export default function LookupPage() {
         </div>
       )}
 
-      {editedContact && (
-        <div className="mt-8 max-w-2xl">
-          <h2 className="text-xl font-semibold mb-4">Contact Details</h2>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">First Name</label>
-              <Input
-                value={editedContact.first_name || ""}
-                onChange={(e) => handleContactChange("first_name", e.target.value)}
-                placeholder="First Name"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Last Name</label>
-              <Input
-                value={editedContact.last_name || ""}
-                onChange={(e) => handleContactChange("last_name", e.target.value)}
-                placeholder="Last Name"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Email</label>
-              <Input
-                type="email"
-                value={editedContact.email || ""}
-                onChange={(e) => handleContactChange("email", e.target.value)}
-                placeholder="Email"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Phone</label>
-              <Input
-                type="tel"
-                value={editedContact.phone || ""}
-                onChange={(e) => handleContactChange("phone", e.target.value)}
-                placeholder="Phone Number"
-              />
-            </div>
+      <div className="mt-8 max-w-2xl">
+        <h2 className="text-xl font-semibold mb-4">Contact Details</h2>
+        {!isLoading && !result?.error && !editedContact && hasSearched && (
+          <p className="text-gray-600 text-sm mb-4">No contact found. Search above to update contact details.</p>
+        )}
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-2">First Name</label>
+            <Input
+              value={editedContact?.first_name || ""}
+              onChange={(e) => handleContactChange("first_name", e.target.value)}
+              placeholder="First Name"
+              disabled={!editedContact}
+            />
           </div>
-          <div className="mt-6">
-            <Button onClick={handleUpdate} disabled={isUpdating}>
-              {isUpdating ? 'Updating...' : 'Update Contact'}
-            </Button>
-            {updateSuccess && (
-              <p className="mt-2 text-green-600 text-sm">Contact updated successfully!</p>
-            )}
+          <div>
+            <label className="block text-sm font-medium mb-2">Last Name</label>
+            <Input
+              value={editedContact?.last_name || ""}
+              onChange={(e) => handleContactChange("last_name", e.target.value)}
+              placeholder="Last Name"
+              disabled={!editedContact}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Email</label>
+            <Input
+              type="email"
+              value={editedContact?.email || ""}
+              onChange={(e) => handleContactChange("email", e.target.value)}
+              placeholder="Email"
+              disabled={!editedContact}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Phone</label>
+            <Input
+              type="tel"
+              value={editedContact?.phone || ""}
+              onChange={(e) => handleContactChange("phone", e.target.value)}
+              placeholder="Phone Number"
+              disabled={!editedContact}
+            />
           </div>
         </div>
-      )}
+        <div className="mt-6">
+          <Button onClick={handleUpdate} disabled={isUpdating || !editedContact}>
+            {isUpdating ? 'Updating...' : 'Update Contact'}
+          </Button>
+          {updateSuccess && (
+            <p className="mt-2 text-green-600 text-sm">Contact updated successfully!</p>
+          )}
+        </div>
+      </div>
     </div>
   )
 } 
