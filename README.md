@@ -1,4 +1,4 @@
-# Integration Use Case Template
+# CRM Integration Example
 
 This is a template for an application showcasing integration capabilities using [Integration.app](https://integration.app). The app is built with Next.js and demonstrates how to implement user authentication and integration token generation.
 

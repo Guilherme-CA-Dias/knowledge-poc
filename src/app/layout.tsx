@@ -7,10 +7,10 @@ import { AuthProvider } from "./auth-provider"
 
 export const metadata = {
   title: {
-    default: "Use Case Template",
-    template: "%s | Use Case Template",
+    default: "CRM Integration Example",
+    template: "%s | CRM Integration Example",
   },
-  description: "Integration.app use case template application",
+  description: "Integration.app CRM Integration Example",
 }
 
 export default function RootLayout({

@@ -13,7 +13,7 @@ export default function HomePage() {
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Overview</h1>
             <p className="text-muted-foreground">
-              Welcome to Use Case Template
+              Welcome to the CRM Integration Example
             </p>
           </div>
         </div>
