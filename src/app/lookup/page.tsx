@@ -32,7 +32,7 @@ export default function LookupPage() {
   const [firstConnection, setFirstConnection] = useState<{ id: string, name: string } | null>(null)
   const integrationApp = useIntegrationApp()
 
-  // Fetch first connection on mount
+  // For demo: just fetch first available connection on mount
   useEffect(() => {
     const fetchConnection = async () => {
       const connections = await integrationApp.connections.find()
@@ -76,6 +76,7 @@ export default function LookupPage() {
         ? { phone: lookupValue }
         : { email: lookupValue }
 
+      // Call the action in Integration App
       const response = await integrationApp
         .connection(firstConnection.id)
         .action(action)

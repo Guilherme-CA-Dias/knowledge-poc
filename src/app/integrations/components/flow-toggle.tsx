@@ -21,6 +21,7 @@ export function FlowToggle({ integration, label, flowSelector }: SyncButtonProps
       if (!integration.connection?.id) return
       
       try {
+        // Get the current flow enabled state
         const flowState = await integrationApp
           .connection(integration.connection.id)
           .flow(flowSelector)
@@ -43,6 +44,7 @@ export function FlowToggle({ integration, label, flowSelector }: SyncButtonProps
     
     setIsLoading(true)
     try {
+      // Toggle the flow enabled state
       await integrationApp
         .connection(integration.connection.id)
         .flow(flowSelector)

@@ -10,6 +10,7 @@ export function IntegrationList() {
 
   const handleConnect = async (integration: IntegrationAppIntegration) => {
     try {
+      // Use built-in UI for creating new connection
       await integrationApp
         .integration(integration.key)
         .openNewConnection()
@@ -34,6 +35,7 @@ export function IntegrationList() {
   const handleOpenFieldMapping = async (integration: IntegrationAppIntegration) => {
     if (!integration.connection?.id) return
     try {
+      // Use built-in UI for configuring field mapping
       await integrationApp
         .connection(integration.connection.id)
         .fieldMapping('contacts')

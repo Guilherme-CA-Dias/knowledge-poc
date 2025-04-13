@@ -31,6 +31,7 @@ export async function GET(request: NextRequest) {
     while (hasMoreContacts) {
       console.log(`Fetching contacts with cursor: ${currentCursor}`);
       
+      // Call synchronous action in Integration App
       const result = await client
         .connection(firstConnection.id)
         .action('get-contacts')
