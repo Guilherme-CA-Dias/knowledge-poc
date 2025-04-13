@@ -1,0 +1,24 @@
+isCustomized: true
+key: find-contact-by-email
+state: READY
+errors: []
+isDeactivated: false
+id: 67f6a1b4ebd23a63dc90ffb3
+name: Find Contact By Email
+type: match-data-record
+inputSchema:
+  type: object
+  properties:
+    email:
+      type: string
+config:
+  fieldMapping:
+    key: contacts
+    includeRawFields: false
+  dataSource:
+    key: contacts
+  lookup:
+    universalQuery:
+      primaryEmail:
+        $var: $.input.email
+isDeployed: true

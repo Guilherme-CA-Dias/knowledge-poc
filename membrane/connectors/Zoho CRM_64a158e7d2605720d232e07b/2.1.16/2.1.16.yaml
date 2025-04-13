@@ -1,0 +1,1386 @@
+name: Zoho CRM
+key: zoho-crm
+logoUri: https://static.integration.app/connectors/zoho-crm/logo.png
+apiDocsUri: https://www.zoho.com/crm/developer/docs/api/v2/
+parametersSchema:
+  type: object
+  properties:
+    clientId:
+      type: string
+    clientSecret:
+      type: string
+    scopes:
+      type: array
+      items:
+        type: string
+        enum:
+          - ZohoCRM.modules.ALL
+          - ZohoCRM.users.ALL
+          - ZohoCRM.settings.ALL
+          - ZohoCRM.org.READ
+          - ZohoCRM.notifications.ALL
+          - ZohoCRM.settings.pipeline.READ
+          - ZohoCRM.settings.profiles.READ
+          - ZohoCRM.settings.global_picklist.ALL
+      default:
+        - ZohoCRM.modules.ALL
+        - ZohoCRM.users.ALL
+        - ZohoCRM.settings.ALL
+        - ZohoCRM.org.READ
+        - ZohoCRM.notifications.ALL
+        - ZohoCRM.settings.pipeline.READ
+        - ZohoCRM.settings.profiles.READ
+        - ZohoCRM.settings.global_picklist.ALL
+auth:
+  type: oauth2
+  getOAuthConfig:
+    implementationType: mapping
+    filePath: auth/get-oauth-config.map.yml
+  getTokenData:
+    implementationType: javascript
+    filePath: auth/get-token-data.js
+  getCredentialsFromTokenResponse:
+    implementationType: javascript
+  makeApiClient:
+    implementationType: mapping
+    filePath: auth/make-api-client.map.yml
+  test:
+    implementationType: javascript
+    filePath: auth/test.js
+  getCredentialsFromAccessTokenResponse:
+    implementationType: javascript
+    filePath: auth/get-credentials-from-access-token-response.js
+  refreshCredentials:
+    implementationType: javascript
+    filePath: auth/refresh-credentials.js
+  ui:
+    schema:
+      type: object
+      properties:
+        account_type:
+          type: string
+          enum:
+            - production
+            - developer
+            - sandbox
+          description: What is the type of your Zoho account you want to connect to?
+          default: production
+  enabled:
+    $eval:
+      $var: $.connectorParameters.clientId
+    isNotEmpty: true
+  options:
+    auth-proxy:
+      type: proxy
+      title: OAuth (via Integration.app)
+      proxyKey: zoho-crm
+      enabled:
+        $eval:
+          $var: $.connectorParameters.clientId
+        isEmpty: true
+      ui:
+        schema:
+          type: object
+          properties:
+            account_type:
+              type: string
+              enum:
+                - production
+                - developer
+                - sandbox
+              description: What is the type of your Zoho account you want to connect to?
+              default: production
+  credentialsSchema:
+    type: object
+    properties:
+      access_token:
+        type: string
+        title: Access Token
+        description: Access token to use for API calls
+      refresh_token:
+        type: string
+        title: Refresh Token
+        description: Refresh token to use for API calls
+api:
+  type: openapi
+udm:
+  companies:
+    collectionMappings:
+      - key: Accounts
+        fieldsFromCollection:
+          id:
+            $var: $.id
+          name:
+            $var: $.Account_Name
+          description:
+            $var: $.Description
+          websiteUrl:
+            $var: $.Website
+          ownerId:
+            $var: $.Owner.id
+          primaryPhone:
+            $var: $.Phone
+          phones:
+            - value:
+                $var: $.Phone
+          industry:
+            $var: $.Industry
+          numberOfEmployees:
+            $var: $.Employees
+          primaryAddress:
+            full:
+              $concat:
+                values:
+                  - $var: $.Billing_Street
+                  - $var: $.Billing_City
+                  - $var: $.Billing_State
+                  - $var: $.Billing_Country
+                  - $var: $.Billing_Code
+                delimiter: ', '
+            street:
+              $var: $.Billing_Street
+            city:
+              $var: $.Billing_City
+            state:
+              $var: $.Billing_State
+            country:
+              $var: $.Billing_Country
+            zip:
+              $var: $.Billing_Code
+          addresses:
+            - full:
+                $concat:
+                  values:
+                    - $var: $.Shipping_Street
+                    - $var: $.Shipping_City
+                    - $var: $.Shipping_State
+                    - $var: $.Shipping_Country
+                    - $var: $.Shipping_Code
+                  delimiter: ', '
+              street:
+                $var: $.Shipping_Street
+              city:
+                $var: $.Shipping_City
+              state:
+                $var: $.Shipping_State
+              country:
+                $var: $.Shipping_Country
+              zip:
+                $var: $.Shipping_Code
+            - full:
+                $concat:
+                  values:
+                    - $var: $.Billing_Street
+                    - $var: $.Billing_City
+                    - $var: $.Billing_State
+                    - $var: $.Billing_Country
+                    - $var: $.Billing_Code
+                  delimiter: ', '
+              street:
+                $var: $.Billing_Street
+              city:
+                $var: $.Billing_City
+              state:
+                $var: $.Billing_State
+              country:
+                $var: $.Billing_Country
+              zip:
+                $var: $.Billing_Code
+          createdTime:
+            $var: $.Created_Time
+          createdBy:
+            $var: $.Created_By.id
+          updatedTime:
+            $var: $.Modified_Time
+          updatedBy:
+            $var: $.Modified_By.id
+          lastActivityTime:
+            $var: $.Last_Activity_Time
+        fieldsToCollection:
+          Account_Name:
+            $var: $.name
+          Description:
+            $var: $.description
+          Website:
+            $var: $.websiteUrl
+          Owner:
+            id:
+              $var: $.ownerId
+          Phone:
+            $var: $.primaryPhone
+          Employees:
+            $var: $.numberOfEmployees
+          Industry:
+            $var: $.industry
+          Billing_Street:
+            $var: $.primaryAddress.street
+          Billing_City:
+            $var: $.primaryAddress.city
+          Billing_State:
+            $var: $.primaryAddress.state
+          Billing_Country:
+            $var: $.primaryAddress.country
+          Billing_Code:
+            $var: $.primaryAddress.zip
+          Shipping_Street:
+            $var: $.addresses[0].street
+          Shipping_City:
+            $var: $.addresses[0].city
+          Shipping_State:
+            $var: $.addresses[0].state
+          Shipping_Country:
+            $var: $.addresses[0].country
+          Shipping_Code:
+            $var: $.addresses[0].zip
+          Created_Time:
+            $var: $.createdTime
+          Created_By:
+            id:
+              $var: $.createdBy
+          Modified_By:
+            id:
+              $var: $.updatedBy
+          Modified_Time:
+            $var: $.updatedTime
+          Last_Activity_Time:
+            $var: $.lastActivityTime
+          id:
+            $var: $.id
+    defaultCollection:
+      key: Accounts
+  activities:
+    collectionMappings:
+      - key: Calls
+        fieldsFromCollection:
+          id:
+            $var: $.id
+          description:
+            $var: $.Description
+          title:
+            $var: $.Subject
+          type:
+            $var: $.Call_Type
+          durationSeconds:
+            $var: $.Call_Duration_in_seconds
+          contactId:
+            $var: $.Who_Id.id
+          companyId:
+            $case:
+              cases:
+                - filter:
+                    $eval:
+                      $var: $.What_Id.type
+                    is: Accounts
+                  value:
+                    $var: $.What_Id.id
+          dealId:
+            $case:
+              cases:
+                - filter:
+                    $eval:
+                      $var: $.What_Id.type
+                    is: Deals
+                  value:
+                    $var: $.What_Id.id
+          leadId:
+            $case:
+              cases:
+                - filter:
+                    $eval:
+                      $var: $.What_Id.type
+                    is: Leads
+                  value:
+                    $var: $.What_Id.id
+          ownerId:
+            $var: $.Owner.id
+          startTime:
+            $var: $.Call_Start_Time
+          createdTime:
+            $var: $.Created_Time
+          updatedTime:
+            $var: $.Modified_Time
+          createdBy:
+            $var: $.Created_By.id
+          updatedBy:
+            $var: $.Modified_By.id
+          status:
+            $var: $.Call_Status
+        fieldsToCollection:
+          Subject:
+            $var: $.title
+          Description:
+            $var: $.description
+          Owner:
+            id:
+              $var: $.ownerId
+          Call_Start_Time:
+            $var: $.startTime
+          Call_Type:
+            $var: $.type
+          Who_Id:
+            id:
+              $var: $.contactId
+          What_Id:
+            $case:
+              cases:
+                - filter:
+                    $eval:
+                      $var: $.companyId
+                    isNotEmpty: true
+                  value:
+                    type: Accounts
+                    id:
+                      $var: $.companyId
+                - filter:
+                    $eval:
+                      $var: $.dealId
+                    isNotEmpty: true
+                  value:
+                    type: Deals
+                    id:
+                      $var: $.dealId
+                - filter:
+                    $eval:
+                      $var: $.leadId
+                    isNotEmpty: true
+                  value:
+                    type: Leads
+                    id:
+                      $var: $.leadId
+          Created_Time:
+            $var: $.createdTime
+          Created_By:
+            id:
+              $var: $.createdBy
+          Modified_Time:
+            $var: $.updatedTime
+          Modified_By:
+            id:
+              $var: $.updatedBy
+          id:
+            $var: $.id
+          Call_Duration_in_seconds:
+            $var: $.durationSeconds
+          Call_Status:
+            $var: $.status
+    defaultCollection:
+      key: Calls
+  campaigns:
+    collectionMappings:
+      - key: Campaigns
+        fieldsFromCollection:
+          id:
+            $var: $.id
+          name:
+            $var: $.Campaign_Name
+          cost:
+            $var: $.Budgeted_Cost
+          description:
+            $var: $.Description
+          stage:
+            $var: $.Status
+          type:
+            $var: $.Type
+          ownerId:
+            $var: $.Owner.id
+          sentCount:
+            $var: $.Num_sent
+          startTime:
+            $var: $.Start_Date
+          endTime:
+            $var: $.End_Date
+          createdTime:
+            $var: $.Created_Time
+          createdBy:
+            $var: $.Created_By.id
+          updatedTime:
+            $var: $.Modified_Time
+          updatedBy:
+            $var: $.Modified_By.id
+        fieldsToCollection:
+          Campaign_Name:
+            $var: $.name
+          Owner:
+            id:
+              $var: $.ownerId
+          Description:
+            $var: $.description
+          Type:
+            $var: $.type
+          Start_Date:
+            $var: $.startTime
+          End_Date:
+            $var: $.endTime
+          Status:
+            $var: $.stage
+          Num_sent:
+            $var: $.sentCount
+          Budgeted_Cost:
+            $var: $.cost
+          Modified_By:
+            id:
+              $var: $.updatedBy
+          Modified_Time:
+            $var: $.updatedTime
+          Created_By:
+            id:
+              $var: $.createdBy
+          Created_Time:
+            $var: $.createdTime
+          id:
+            $var: $.id
+    defaultCollection:
+      key: Campaigns
+  contacts:
+    collectionMappings:
+      - key: Contacts
+        fieldsFromCollection:
+          id:
+            $var: $.id
+          fullName:
+            $var: $.Full_Name
+          firstName:
+            $var: $.First_Name
+          lastName:
+            $var: $.Last_Name
+          primaryEmail:
+            $var: $.Email
+          emails:
+            - value:
+                $var: $.Email
+            - value:
+                $var: $.Secondary_Email
+          primaryPhone:
+            $var: $.Phone
+          phones:
+            - value:
+                $var: $.Phone
+            - value:
+                $var: $.Mobile
+            - value:
+                $var: $.Home_Phone
+            - value:
+                $var: $.Other_Phone
+          primaryAddress:
+            street:
+              $var: $.Mailing_Street
+            city:
+              $var: $.Mailing_City
+            state:
+              $var: $.Mailing_State
+            country:
+              $var: $.Mailing_Country
+            zip:
+              $var: $.Mailing_Zip
+            full:
+              $concat:
+                values:
+                  - $var: $.Mailing_Street
+                  - $var: $.Mailing_City
+                  - $var: $.Mailing_State
+                  - $var: $.Mailing_Country
+                  - $var: $.Mailing_Zip
+                delimiter: ', '
+          companyId:
+            $var: $.Account_Name
+          ownerId:
+            $var: $.Owner
+          jobTitle:
+            $var: $.Title
+          source:
+            $var: $.Lead_Source
+          createdTime:
+            $var: $.Created_Time
+          createdBy:
+            $var: $.Created_By
+          updatedTime:
+            $var: $.Modified_Time
+          updatedBy:
+            $var: $.Modified_By
+          lastActivityTime:
+            $var: $.Last_Activity_Time
+          addresses:
+            - street:
+                $var: $.Mailing_Street
+              city:
+                $var: $.Mailing_City
+              state:
+                $var: $.Mailing_State
+              country:
+                $var: $.Mailing_Country
+              zip:
+                $var: $.Mailing_Zip
+              full:
+                $concat:
+                  values:
+                    - $var: $.Mailing_Street
+                    - $var: $.Mailing_City
+                    - $var: $.Mailing_State
+                    - $var: $.Mailing_Country
+                    - $var: $.Mailing_Zip
+                  delimiter: ', '
+            - street:
+                $var: $.Other_Street
+              city:
+                $var: $.Other_City
+              state:
+                $var: $.Other_State
+              country:
+                $var: $.Other_Country
+              zip:
+                $var: $.Other_Zip
+              full:
+                $concat:
+                  values:
+                    - $var: $.Other_Street
+                    - $var: $.Other_City
+                    - $var: $.Other_State
+                    - $var: $.Other_Country
+                    - $var: $.Other_Zip
+                  delimiter: ', '
+        fieldsToCollection:
+          First_Name:
+            $var: $.firstName
+          Last_Name:
+            $var: $.lastName
+          Full_Name:
+            $var: $.fullName
+          Title:
+            $var: $.jobTitle
+          Email:
+            $var: $.primaryEmail
+          Phone:
+            $var: $.primaryPhone
+          Account_Name:
+            $var: $.companyId
+          Lead_Source:
+            $var: $.source
+          Owner:
+            $var: $.ownerId
+          Last_Activity_Time:
+            $var: $.lastActivityTime
+          Created_Time:
+            $var: $.createdTime
+          Created_By:
+            $var: $.createdBy
+          Modified_By:
+            $var: $.updatedBy
+          Modified_Time:
+            $var: $.updatedTime
+          id:
+            $var: $.id
+    defaultCollection:
+      key: Contacts
+  deals:
+    collectionMappings:
+      - key: Deals
+        fieldsFromCollection:
+          id:
+            $var: $.id
+          name:
+            $var: $.Deal_Name
+          amount:
+            $var: $.Amount
+          companyId:
+            $var: $.Account_Name.id
+          contactId:
+            $var: $.Contact_Name.id
+          campaignId:
+            $var: $.Campaign_Source.id
+          source:
+            $var: $.Lead_Source
+          description:
+            $var: $.Description
+          stage:
+            $var: $.Stage
+          type:
+            $var: $.Type
+          ownerId:
+            $var: $.Owner.id
+          closeTime:
+            $var: $.Closing_Date
+          createdTime:
+            $var: $.Created_Time
+          createdBy:
+            $var: $.Created_By.id
+          updatedTime:
+            $var: $.Modified_Time
+          updatedBy:
+            $var: $.Modified_By.id
+          lastActivityTime:
+            $var: $.Last_Activity_Time
+          probability:
+            $var: $.Probability
+        fieldsToCollection:
+          Deal_Name:
+            $var: $.name
+          Description:
+            $var: $.description
+          Amount:
+            $var: $.amount
+          Closing_Date:
+            $var: $.closeTime
+          Stage:
+            $var: $.stage
+          Account_Name:
+            id:
+              $var: $.companyId
+          Probability:
+            $var: $.probability
+          Owner:
+            id:
+              $var: $.ownerId
+          Contact_Name:
+            id:
+              $var: $.contactId
+          Type:
+            $var: $.type
+          Lead_Source:
+            $var: $.source
+          Campaign_Source:
+            id:
+              $var: $.campaignId
+          Created_Time:
+            $var: $.createdTime
+          Created_By:
+            id:
+              $var: $.createdBy
+          Modified_Time:
+            $var: $.updatedTime
+          Modified_By:
+            id:
+              $var: $.updatedBy
+          Last_Activity_Time:
+            $var: $.lastActivityTime
+          id:
+            $var: $.id
+      - key: deals-by-pipeline
+        fieldsFromCollection:
+          id:
+            $var: $.id
+          name:
+            $var: $.Deal_Name
+          amount:
+            $var: $.Amount
+          companyId:
+            $var: $.Account_Name.id
+          contactId:
+            $var: $.Contact_Name.id
+          campaignId:
+            $var: $.Campaign_Source.id
+          source:
+            $var: $.Lead_Source
+          description:
+            $var: $.Description
+          stage:
+            $var: $.Stage
+          type:
+            $var: $.Type
+          ownerId:
+            $var: $.Owner.id
+          closeTime:
+            $var: $.Closing_Date
+          createdTime:
+            $var: $.Created_Time
+          createdBy:
+            $var: $.Created_By.id
+          updatedTime:
+            $var: $.Modified_Time
+          updatedBy:
+            $var: $.Modified_By.id
+          lastActivityTime:
+            $var: $.Last_Activity_Time
+          probability:
+            $var: $.Probability
+        fieldsToCollection:
+          Deal_Name:
+            $var: $.name
+          Description:
+            $var: $.description
+          Amount:
+            $var: $.amount
+          Closing_Date:
+            $var: $.closeTime
+          Stage:
+            $var: $.stage
+          Account_Name:
+            id:
+              $var: $.companyId
+          Probability:
+            $var: $.probability
+          Owner:
+            id:
+              $var: $.ownerId
+          Contact_Name:
+            id:
+              $var: $.contactId
+          Type:
+            $var: $.type
+          Lead_Source:
+            $var: $.source
+          Campaign_Source:
+            id:
+              $var: $.campaignId
+          Created_Time:
+            $var: $.createdTime
+          Created_By:
+            id:
+              $var: $.createdBy
+          Modified_Time:
+            $var: $.updatedTime
+          Modified_By:
+            id:
+              $var: $.updatedBy
+          Last_Activity_Time:
+            $var: $.lastActivityTime
+          id:
+            $var: $.id
+    defaultCollection:
+      key: Deals
+  meetings:
+    collectionMappings:
+      - key: Events
+        fieldsFromCollection:
+          id:
+            $var: $.id
+          title:
+            $var: $.Event_Title
+          description:
+            $var: $.Description
+          contactId:
+            $var: $.Who_Id.id
+          companyId:
+            $case:
+              cases:
+                - filter:
+                    $eval:
+                      $var: $.What_Id.type
+                    is: Accounts
+                  value:
+                    $var: $.What_Id.id
+          dealId:
+            $case:
+              cases:
+                - filter:
+                    $eval:
+                      $var: $.What_Id.type
+                    is: Deals
+                  value:
+                    $var: $.What_Id.id
+          leadId:
+            $case:
+              cases:
+                - filter:
+                    $eval:
+                      $var: $.What_Id.type
+                    is: Leads
+                  value:
+                    $var: $.What_Id.id
+          ownerId:
+            $var: $.Owner.id
+          createdTime:
+            $var: $.Created_Time
+          createdBy:
+            $var: $.Created_By.id
+          updatedTime:
+            $var: $.Modified_Time
+          updatedBy:
+            $var: $.Modified_By.id
+          startTime:
+            $var: $.Start_DateTime
+          endTime:
+            $var: $.End_DateTime
+          participants:
+            $iterate:
+              source:
+                $var: $.Participants
+              item:
+                userId:
+                  $case:
+                    cases:
+                      - filter:
+                          $eval:
+                            $var: $.item.type
+                          is: user
+                        value:
+                          $var: $.item.participant
+                contactId:
+                  $case:
+                    cases:
+                      - filter:
+                          $eval:
+                            $var: $.item.type
+                          is: contact
+                        value:
+                          $var: $.item.participant
+                leadId:
+                  $case:
+                    cases:
+                      - filter:
+                          $eval:
+                            $var: $.item.type
+                          is: lead
+                        value:
+                          $var: $.item.participant
+        fieldsToCollection:
+          id:
+            $var: $.id
+          Event_Title:
+            $var: $.title
+          Description:
+            $var: $.description
+          Owner:
+            id:
+              $var: $.ownerId
+          Start_DateTime:
+            $var: $.startTime
+          End_DateTime:
+            $var: $.endTime
+          Who_Id:
+            id:
+              $var: $.contactId
+          What_Id:
+            $case:
+              cases:
+                - filter:
+                    $eval:
+                      $var: $.companyId
+                    isNotEmpty: true
+                  value:
+                    type: Accounts
+                    id:
+                      $var: $.companyId
+                - filter:
+                    $eval:
+                      $var: $.dealId
+                    isNotEmpty: true
+                  value:
+                    type: Deals
+                    id:
+                      $var: $.dealId
+                - filter:
+                    $eval:
+                      $var: $.leadId
+                    isNotEmpty: true
+                  value:
+                    type: Leads
+                    id:
+                      $var: $.leadId
+          Participants:
+            $iterate:
+              source:
+                $var: $.participants
+              item:
+                $case:
+                  cases:
+                    - filter:
+                        $eval:
+                          $var: $.item.userId
+                        isNotEmpty: true
+                      value:
+                        type: user
+                        participant:
+                          $var: $.item.userId
+                    - filter:
+                        $eval:
+                          $var: $.item.contactId
+                        isNotEmpty: true
+                      value:
+                        type: contact
+                        participant:
+                          $var: $.item.contactId
+                    - filter:
+                        $eval:
+                          $var: $.item.leadId
+                        isNotEmpty: true
+                      value:
+                        type: lead
+                        participant:
+                          $var: $.item.leadId
+          Modified_By:
+            id:
+              $var: $.updatedBy
+          Modified_Time:
+            $var: $.updatedTime
+          Created_Time:
+            $var: $.createdTime
+          Created_By:
+            id:
+              $var: $.createdBy
+    defaultCollection:
+      key: Events
+  notes:
+    collectionMappings:
+      - key: Notes
+        fieldsFromCollection:
+          id:
+            $var: $.id
+          title:
+            $var: $.Note_Title
+          description:
+            $var: $.Note_Content
+          contactId:
+            $case:
+              cases:
+                - filter:
+                    $eval:
+                      $var: $.Parent_Id.type
+                    is: Contacts
+                  value:
+                    $var: $.Parent_Id.id
+          dealId:
+            $case:
+              cases:
+                - filter:
+                    $eval:
+                      $var: $.Parent_Id.type
+                    is: Deals
+                  value:
+                    $var: $.Parent_Id.id
+          companyId:
+            $case:
+              cases:
+                - filter:
+                    $eval:
+                      $var: $.Parent_Id.type
+                    is: Accounts
+                  value:
+                    $var: $.Parent_Id.id
+          leadId:
+            $case:
+              cases:
+                - filter:
+                    $eval:
+                      $var: $.Parent_Id.type
+                    is: Leads
+                  value:
+                    $var: $.Parent_Id.id
+          ownerId:
+            $var: $.Owner.id
+          createdTime:
+            $var: $.Created_Time
+          createdBy:
+            $var: $.Created_By.id
+          updatedTime:
+            $var: $.Modified_Time
+          updatedBy:
+            $var: $.Modified_By.id
+          content:
+            $var: $.Note_Content
+        fieldsToCollection:
+          Note_Title:
+            $var: $.title
+          Note_Content:
+            $var: $.content
+          Owner:
+            id:
+              $var: $.ownerId
+          Parent_Id:
+            $case:
+              cases:
+                - filter:
+                    $eval:
+                      $var: $.dealId
+                    isNotEmpty: true
+                  value:
+                    type: Deals
+                    id:
+                      $var: $.dealId
+                - filter:
+                    $eval:
+                      $var: $.companyId
+                    isNotEmpty: true
+                  value:
+                    type: Accounts
+                    id:
+                      $var: $.companyId
+                - filter:
+                    $eval:
+                      $var: $.contactId
+                    isNotEmpty: true
+                  value:
+                    type: Contacts
+                    id:
+                      $var: $.contactId
+                - filter:
+                    $eval:
+                      $var: $.leadId
+                    isNotEmpty: true
+                  value:
+                    type: Leads
+                    id:
+                      $var: $.leadId
+          Modified_By:
+            id:
+              $var: $.updatedBy
+          Created_By:
+            id:
+              $var: $.createdBy
+          Modified_Time:
+            $var: $.updatedTime
+          Created_Time:
+            $var: $.createdTime
+          id:
+            $var: $.id
+    defaultCollection:
+      key: Notes
+  tasks:
+    collectionMappings:
+      - key: Tasks
+        fieldsFromCollection:
+          id:
+            $var: $.id
+          title:
+            $var: $.Subject
+          description:
+            $var: $.Description
+          status:
+            $var: $.Status
+          contactId:
+            $var: $.Who_Id.id
+          companyId:
+            $case:
+              cases:
+                - filter:
+                    $eval:
+                      $var: $.What_Id.type
+                    is: Accounts
+                  value:
+                    $var: $.What_Id.id
+          dealId:
+            $case:
+              cases:
+                - filter:
+                    $eval:
+                      $var: $.What_Id.type
+                    is: Deals
+                  value:
+                    $var: $.What_Id.id
+          leadId:
+            $case:
+              cases:
+                - filter:
+                    $eval:
+                      $var: $.What_Id.type
+                    is: Leads
+                  value:
+                    $var: $.What_Id.id
+          ownerId:
+            $var: $.Owner.id
+          createdTime:
+            $var: $.Created_Time
+          updatedTime:
+            $var: $.Modified_Time
+          createdBy:
+            $var: $.Created_By.id
+          updatedBy:
+            $var: $.Modified_By.id
+          endTime:
+            $var: $.Closed_Time
+          dueTime:
+            $var: $.Due_Date
+          subject:
+            $var: $.Subject
+          content:
+            $var: $.Description
+          priority:
+            $var: $.Priority
+        fieldsToCollection:
+          Subject:
+            $var: $.subject
+          Owner:
+            id:
+              $var: $.ownerId
+          Closed_Time:
+            $var: $.endTime
+          Description:
+            $var: $.content
+          Who_Id:
+            id:
+              $var: $.contactId
+          What_Id:
+            $case:
+              cases:
+                - filter:
+                    $eval:
+                      $var: $.companyId
+                    isNotEmpty: true
+                  value:
+                    type: Accounts
+                    id:
+                      $var: $.companyId
+                - filter:
+                    $eval:
+                      $var: $.dealId
+                    isNotEmpty: true
+                  value:
+                    type: Deals
+                    id:
+                      $var: $.dealId
+                - filter:
+                    $eval:
+                      $var: $.leadId
+                    isNotEmpty: true
+                  value:
+                    type: Leads
+                    id:
+                      $var: $.leadId
+          Status:
+            $var: $.status
+          Due_Date:
+            $var: $.dueTime
+          Created_Time:
+            $var: $.createdTime
+          Created_By:
+            id:
+              $var: $.createdBy
+          Modified_Time:
+            $var: $.updatedTime
+          Modified_By:
+            id:
+              $var: $.updatedBy
+          id:
+            $var: $.id
+          Priority:
+            $var: $.priority
+    defaultCollection:
+      key: Tasks
+  users:
+    collectionMappings:
+      - key: users
+        fieldsFromCollection:
+          id:
+            $var: $.id
+          fullName:
+            $var: $.full_name
+          firstName:
+            $var: $.first_name
+          lastName:
+            $var: $.last_name
+          primaryEmail:
+            $var: $.email
+          primaryPhone:
+            $var: $.phone
+          phones:
+            - value:
+                $var: $.phone
+            - value:
+                $var: $.mobile
+          timezone:
+            $var: $.time_zone
+          createdTime:
+            $var: $.created_time
+          createdBy:
+            $var: $.created_by.id
+          updatedTime:
+            $var: $.Modified_Time
+          updatedBy:
+            $var: $.Modified_By.id
+          roleId:
+            $var: $.role.id
+        fieldsToCollection:
+          full_name:
+            $var: $.fullName
+          first_name:
+            $var: $.firstName
+          last_name:
+            $var: $.lastName
+          email:
+            $var: $.primaryEmail
+          phone:
+            $var: $.primaryPhone
+          time_zone:
+            $var: $.timezone
+          created_time:
+            $var: $.createdTime
+          created_by:
+            id:
+              $var: $.createdBy
+          id:
+            $var: $.id
+          role:
+            id:
+              $var: $.roleId
+          Modified_By:
+            id:
+              $var: $.updatedBy
+          Modified_Time:
+            $var: $.updatedTime
+    defaultCollection:
+      key: users
+  leads:
+    collectionMappings:
+      - key: Leads
+        fieldsFromCollection:
+          id:
+            $var: $.id
+          fullName:
+            $var: $.Full_Name
+          firstName:
+            $var: $.First_Name
+          lastName:
+            $var: $.Last_Name
+          primaryEmail:
+            $var: $.Email
+          primaryPhone:
+            $var: $.Phone
+          primaryAddress:
+            street:
+              $var: $.Street
+            city:
+              $var: $.City
+            state:
+              $var: $.State
+            country:
+              $var: $.Country
+            zip:
+              $var: $.Zip_Code
+            full:
+              $concat:
+                values:
+                  - $var: $.Street
+                  - $var: $.City
+                  - $var: $.State
+                  - $var: $.Country
+                  - $var: $.Zip_Code
+                delimiter: ', '
+          companyName:
+            $var: $.Company
+          ownerId:
+            $var: $.Owner
+          jobTitle:
+            $var: $.Designation
+          source:
+            $var: $.Lead_Source
+          createdTime:
+            $var: $.Created_Time
+          createdBy:
+            $var: $.Created_By.id
+          updatedTime:
+            $var: $.Modified_Time
+          updatedBy:
+            $var: $.Modified_By.id
+        fieldsToCollection:
+          Owner:
+            $var: $.ownerId
+          Company:
+            $var: $.companyName
+          First_Name:
+            $var: $.firstName
+          Last_Name:
+            $var: $.lastName
+          Full_Name:
+            $var: $.fullName
+          Designation:
+            $var: $.jobTitle
+          Email:
+            $var: $.primaryEmail
+          Phone:
+            $var: $.primaryPhone
+          Lead_Source:
+            $var: $.source
+          Created_By:
+            id:
+              $var: $.createdBy
+          Modified_By:
+            id:
+              $var: $.updatedBy
+          Created_Time:
+            $var: $.createdTime
+          Modified_Time:
+            $var: $.updatedTime
+          Street:
+            $var: $.primaryAddress.street
+          City:
+            $var: $.primaryAddress.city
+          State:
+            $var: $.primaryAddress.state
+          Zip_Code:
+            $var: $.primaryAddress.zip
+          Country:
+            $var: $.primaryAddress.country
+          id:
+            $var: $.id
+    defaultCollection:
+      key: Leads
+  products:
+    collectionMappings:
+      - key: Products
+        fieldsFromCollection:
+          id:
+            $var: id
+          name:
+            $var: Product_Name
+          description:
+            $var: Description
+          code:
+            $var: Product_Code
+          isActive:
+            $var: Product_Active
+          price:
+            $var: Unit_Price
+          createdTime:
+            $var: Created_Time
+          createdBy:
+            $var: Created_By.id
+          updatedTime:
+            $var: Modified_Time
+          updatedBy:
+            $var: Modified_By.id
+          type:
+            $var: $.Product_Category
+        fieldsToCollection:
+          id:
+            $var: id
+          Product_Name:
+            $var: name
+          Product_Code:
+            $var: code
+          Product_Active:
+            $var: isActive
+          Product_Category:
+            $var: type
+          Created_By:
+            id:
+              $var: createdBy
+          Modified_By:
+            id:
+              $var: updatedBy
+          Created_Time:
+            $var: createdTime
+          Modified_Time:
+            $var: updatedTime
+          Unit_Price:
+            $var: price
+          Description:
+            $var: description
+    defaultCollection:
+      key: Products
+id: 64a158e7d2605720d232e07b
+uuid: 2c8930ff-7333-42ac-94b8-1189bcdc9277
+baseUri: s3://integration-app-connectors/public/dce1b6e5-8e03-43b5-afe6-f692a0c72160
+revision: 1b7e3420-0261-4f79-9325-2af960b8f1e2
+hasReadme: false
+status: production
+categories:
+  - CRM
+  - Marketing Automation
+udms:
+  - companies
+  - activities
+  - campaigns
+  - contacts
+  - deals
+  - meetings
+  - notes
+  - tasks
+  - users
+  - leads
+  - products
+isReadOnly: true
+popularity: 839
+appUuid: ae83d614-3dee-48a6-8b2d-944d1ff80687
+dataCollectionsCount: 19
+operationsCount: 569
+eventsCount: 0
+version: 2.1.16

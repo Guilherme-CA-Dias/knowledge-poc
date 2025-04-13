@@ -1,0 +1,103 @@
+key: contacts
+isDeactivated: false
+id: 67f696ba8dc64db93eb4c884
+name: Contacts
+archivedAt: null
+customized: true
+universalFieldMappingId: 67f696b88dc64db93eb4c852
+integrationId: 67f696b68dc64db93eb4c742
+dataSourceKey: contacts
+appSchema:
+  type: object
+  properties:
+    first_name:
+      type: string
+    last_name:
+      type: string
+    email:
+      type: string
+    phone:
+      type: string
+    id:
+      type: string
+direction: both
+defaultImportValue:
+  first_name:
+    $var: $.firstName
+  last_name:
+    $var: $.lastName
+  email:
+    $var: $.primaryEmail
+  phone:
+    $var: $.primaryPhone
+  id:
+    $var: $.id
+defaultExportValue:
+  firstName:
+    $var: $.first_name
+  lastName:
+    $var: $.last_name
+  primaryEmail:
+    $var: $.email
+  primaryPhone:
+    $var: $.phone
+exportValue:
+  name:
+    $concat:
+      values:
+        - $var: $.first_name
+        - $var: $.last_name
+      delimiter: ' '
+  first_name:
+    $var: $.first_name
+  last_name:
+    $var: $.last_name
+  phone:
+    $var: $.phone
+  phones:
+    - value:
+        $var: $.phone
+  emails:
+    - value:
+        $var: $.email
+  email:
+    $var: $.email
+importValue:
+  first_name:
+    $firstName:
+      $var: $.name
+  last_name:
+    $lastName:
+      $var: $.name
+  email:
+    $var: $.email
+  phone:
+    $var: $.phone
+  id:
+    $var: $.id
+integration:
+  key: pipedrive
+  state: READY
+  errors: []
+  isDeactivated: false
+  id: 67f696b68dc64db93eb4c742
+  name: Pipedrive
+  uuid: 9e47d302-5c9e-4264-9c9d-abcfc1594d98
+  connectorId: 644fe4efee0ebe0ca6e9746b
+  hasDefaultParameters: false
+  hasMissingParameters: false
+  hasDocumentation: true
+  hasOperations: true
+  hasData: true
+  hasEvents: false
+  hasGlobalWebhooks: false
+  hasUdm: true
+  areParametersCustomized: false
+  baseUri: s3://integration-app-connectors/public/4b559110-a271-4e58-ae67-1a4bf472f99e
+  connectorVersion: 1.2.11
+  logoUri: https://static.integration.app/connectors/pipedrive-oauth/logo.png
+  dataCollectionsCount: 27
+  operationsCount: 240
+  eventsCount: 0
+  authType: oauth2
+integrationKey: pipedrive

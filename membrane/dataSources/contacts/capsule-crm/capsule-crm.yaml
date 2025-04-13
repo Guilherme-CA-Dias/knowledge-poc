@@ -1,0 +1,38 @@
+key: contacts
+isDeactivated: false
+id: 67f696b88dc64db93eb4c83f
+name: Contacts
+archivedAt: null
+integrationId: 67f696b68dc64db93eb4c740
+customized: false
+universalDataSourceId: 67f696b88dc64db93eb4c82f
+collectionKey: people
+collectionParameters: {}
+udm: contacts
+defaultPath: /data/people
+integration:
+  key: capsule-crm
+  state: READY
+  errors: []
+  isDeactivated: false
+  id: 67f696b68dc64db93eb4c740
+  name: Capsule CRM
+  uuid: 3333028f-c91a-4a85-b27f-e6ff640e4208
+  connectorId: 640734343685521f9f0c9fe7
+  hasDefaultParameters: false
+  hasMissingParameters: false
+  hasDocumentation: false
+  hasOperations: true
+  hasData: true
+  hasEvents: false
+  hasGlobalWebhooks: false
+  hasUdm: true
+  areParametersCustomized: false
+  baseUri: s3://integration-app-connectors/public/ea8e90db-b4bc-4aa9-ab34-bf6c8fcd8b4f
+  connectorVersion: 1.1.0
+  logoUri: https://static.integration.app/connectors/capsule-crm/logo.png
+  dataCollectionsCount: 7
+  operationsCount: 10
+  eventsCount: 0
+  authType: oauth2
+integrationKey: capsule-crm

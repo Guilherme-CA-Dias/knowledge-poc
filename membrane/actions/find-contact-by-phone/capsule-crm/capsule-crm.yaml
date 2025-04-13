@@ -1,0 +1,31 @@
+isCustomized: true
+parentId: 67f6a38af028af5ee98fdd28
+integrationId: 67f696b68dc64db93eb4c740
+key: find-contact-by-phone
+state: READY
+errors: []
+isDeactivated: false
+id: 67f6a38af028af5ee98fdd34
+name: Find Contact By Phone
+archivedAt: null
+type: match-data-record
+inputSchema:
+  type: object
+  properties:
+    phoneNumber:
+      type: string
+config:
+  fieldMapping:
+    key: contacts
+    includeRawFields: false
+  dataSource:
+    key: contacts
+  lookup:
+    universalQuery:
+      primaryPhone:
+        $var: $.input.phoneNumber
+    query:
+      phone:
+        $var: $.input.phoneNumber
+isDeployed: false
+integrationKey: capsule-crm

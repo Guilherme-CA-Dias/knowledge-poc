@@ -1,0 +1,31 @@
+isCustomized: false
+parentId: 67f6a38af028af5ee98fdd28
+integrationId: 67f64cbbbdb16f2ecd4d2366
+key: find-contact-by-phone
+state: READY
+errors: []
+isDeactivated: false
+id: 67f6a38af028af5ee98fdd33
+name: Find Contact By Phone
+archivedAt: null
+type: match-data-record
+inputSchema:
+  type: object
+  properties:
+    phone:
+      type: string
+config:
+  fieldMapping:
+    key: contacts
+    includeRawFields: false
+  dataSource:
+    key: contacts
+  lookup:
+    universalQuery:
+      primaryPhone:
+        $var: $.input.phone
+    query:
+      phone:
+        $var: $.input.phone
+isDeployed: true
+integrationKey: hubspot

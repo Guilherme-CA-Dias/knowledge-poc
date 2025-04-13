@@ -1,0 +1,134 @@
+key: receive-contact-events
+id: 67f696bc8dc64db93eb4c952
+name: Receive Contact Events
+isDeactivated: false
+universalFlowId: 67f696bc8dc64db93eb4c904
+integrationId: 67f64cbbbdb16f2ecd4d2366
+integration:
+  key: hubspot
+  state: READY
+  errors: []
+  isDeactivated: false
+  id: 67f64cbbbdb16f2ecd4d2366
+  name: HubSpot
+  uuid: 3ca0d6ff-ba94-4437-ade2-8d57e1099d6d
+  connectorId: 62471fad996d5c297ae43f5f
+  hasDefaultParameters: false
+  hasMissingParameters: false
+  hasDocumentation: true
+  hasOperations: true
+  hasData: true
+  hasEvents: true
+  hasGlobalWebhooks: true
+  hasUdm: true
+  areParametersCustomized: false
+  baseUri: s3://integration-app-connectors/public/53c3d46c-09f2-407f-aec7-b03deb4f9eae
+  connectorVersion: 1.4.25
+  logoUri: https://static.integration.app/connectors/hubspot/logo.png
+  appUuid: c04f4af3-1704-4693-86a4-9af453205335
+  dataCollectionsCount: 31
+  operationsCount: 646
+  eventsCount: 1
+  authType: oauth2
+nodes:
+  contact-created-trigger:
+    type: data-record-created-trigger
+    name: Contact Created Trigger
+    config:
+      dataSource:
+        key: contacts
+      fieldMapping: {}
+    links:
+      - key: get-all-contact-fields-by-id
+  contact-updated-trigger:
+    type: data-record-updated-trigger
+    name: Contact Updated Trigger
+    config:
+      dataSource:
+        key: contacts
+      fieldMapping: {}
+    links:
+      - key: get-all-contact-fields-by-id2
+  get-all-contact-fields-by-id:
+    type: find-data-record-by-id
+    name: Get all Contact fields by Id
+    config:
+      dataSource:
+        key: contacts
+      fieldMapping:
+        key: contacts
+        includeRawFields: true
+      id:
+        $var: $.input.contact-created-trigger.record.id
+    links:
+      - key: create-contact-in-my-app
+  get-all-contact-fields-by-id2:
+    type: find-data-record-by-id
+    name: Get all Contact fields by Id
+    config:
+      dataSource:
+        key: contacts
+      id:
+        $var: $.input.contact-updated-trigger.record.id
+      fieldMapping:
+        key: contacts
+        includeRawFields: false
+    links:
+      - key: update-contact-in-my-app
+  create-contact-in-my-app:
+    type: api-request-to-your-app
+    name: Create Contact in my App
+    config:
+      request:
+        body:
+          externalContactId:
+            $var: $.input.get-all-contact-fields-by-id.id
+          data:
+            $var: $.input.get-all-contact-fields-by-id
+          userId:
+            $var: $.user.id
+        uri: /api/webhook
+        method: POST
+    links: []
+  update-contact-in-my-app:
+    type: api-request-to-your-app
+    name: Update Contact in my App
+    config:
+      request:
+        body:
+          externalContactId:
+            $var: $.input.get-all-contact-fields-by-id2.id
+          data:
+            $var: $.input.get-all-contact-fields-by-id2
+          userId:
+            $var: $.user.id
+        uri: /api/webhook
+        method: POST
+    links: []
+  delete-contact-in-my-app:
+    type: api-request-to-your-app
+    name: Delete Contact from My App
+    config:
+      request:
+        body:
+          externalContactId:
+            $var: $.input.contact-deleted-trigger.record.id
+          userId:
+            $var: $.user.id
+          externalContactDeleted: true
+        method: POST
+        uri: /api/webhook
+    links: []
+  contact-deleted-trigger:
+    type: data-record-deleted-trigger
+    name: Contact Deleted Trigger
+    config:
+      dataSource:
+        key: contacts
+      fieldMapping: {}
+    links:
+      - key: delete-contact-in-my-app
+autoCreateInstances: false
+customized: false
+isDeployed: true
+integrationKey: hubspot

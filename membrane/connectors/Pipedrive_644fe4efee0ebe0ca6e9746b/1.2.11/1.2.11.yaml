@@ -1,0 +1,667 @@
+name: Pipedrive
+logoUri: https://static.integration.app/connectors/pipedrive-oauth/logo.png
+connectionMode: popup
+key: pipedrive
+parametersSchema:
+  type: object
+  properties:
+    clientId:
+      type: string
+    clientSecret:
+      type: string
+    scopes:
+      type: array
+      items:
+        type: string
+        enum:
+          - base
+          - deals:full
+          - mail:full
+          - activities:full
+          - contacts:full
+          - products:full
+          - users:read
+          - search:read
+          - admin
+          - leads:full
+          - goals:read
+        allowCustom: true
+      default:
+        - base
+        - deals:full
+        - mail:full
+        - activities:full
+        - contacts:full
+        - products:full
+        - users:read
+        - search:read
+        - admin
+        - leads:full
+        - goals:read
+auth:
+  type: oauth2
+  getOAuthConfig:
+    implementationType: mapping
+    filePath: auth/get-oauth-config.map.yml
+  makeApiClient:
+    implementationType: mapping
+    filePath: auth/make-api-client.map.yml
+  enabled:
+    $eval:
+      $var: $.connectorParameters.clientId
+    isNotEmpty: true
+  options:
+    auth-proxy:
+      type: proxy
+      title: OAuth (via Integration.app)
+      proxyKey: pipedrive-oauth
+      enabled:
+        $eval:
+          $var: $.connectorParameters.clientId
+        isEmpty: true
+    api-token:
+      type: client-credentials
+      title: API Token
+      enabled:
+        $case:
+          cases:
+            - filter:
+                $eval:
+                  $var: $.connectorParameters.clientId
+                isEmpty: true
+              value: true
+          default: false
+      ui:
+        schema:
+          type: object
+          properties:
+            api_token:
+              type: string
+              title: API Token
+        helpUri: https://pipedrive.readme.io/docs/how-to-find-the-api-token
+      makeApiClient:
+        implementationType: mapping
+        filePath: auth/api-token/make-api-client.map.yml
+      test:
+        implementationType: javascript
+        filePath: auth/api-token/test.js
+  credentialsSchema:
+    type: object
+    properties:
+      access_token:
+        type: string
+        title: Access Token
+        description: Access token to use for API calls
+      refresh_token:
+        type: string
+        title: Refresh Token
+        description: Refresh token to use for API calls
+apiDocsUri: https://developers.pipedrive.com/docs/api/v1
+api:
+  type: openapi
+udm:
+  activities:
+    collectionMappings:
+      - key: activities
+        fieldsFromCollection:
+          id:
+            $var: $.id
+          title:
+            $var: $.subject
+          description:
+            $var: $.public_description
+          type:
+            $var: $.type
+          location:
+            $var: $.location
+          contactId:
+            $var: $.person_id
+          companyId:
+            $var: $.org_id
+          dealId:
+            $var: $.deal_id
+          leadId:
+            $var: $.lead_id
+          ownerId:
+            $var: $.user_id
+          dueTime:
+            $var: $.due_date
+          createdBy:
+            $var: $.created_by_user_id
+          createdTime:
+            $var: $.add_time
+          updatedBy:
+            $var: $.update_user_id
+          updatedTime:
+            $var: $.update_time
+          participants:
+            $iterate:
+              source:
+                $var: $.participants
+              item:
+                contactId:
+                  $var: $.item.person_id
+          durationSeconds:
+            $var: $.duration
+        fieldsToCollection:
+          org_id:
+            $var: $.companyId
+          user_id:
+            $var: $.ownerId
+          type:
+            $var: $.type
+          location:
+            $var: $.location
+          subject:
+            $var: $.title
+          person_id:
+            $var: $.contactId
+          deal_id:
+            $var: $.dealId
+          lead_id:
+            $var: $.leadId
+          due_date:
+            $var: $.dueTime
+          created_by_user_id:
+            $var: $.createdBy
+          add_time:
+            $var: $.createdTime
+          update_user_id:
+            $var: $.updatedBy
+          update_time:
+            $var: $.updatedTime
+          participants:
+            $iterate:
+              source:
+                $var: $.participants
+              item:
+                person_id:
+                  $var: $.item.contactId
+                primary_flag: false
+          public_description:
+            $var: $.description
+          duration:
+            $var: $.durationSeconds
+          id:
+            $var: $.id
+      - key: notes
+        fieldsFromCollection:
+          id:
+            $var: $.id
+          description:
+            $var: $.content
+          contactId:
+            $var: $.person_id
+          companyId:
+            $var: $.org_id
+          dealId:
+            $var: $.deal_id
+          leadId:
+            $var: $.lead_id
+          ownerId:
+            $var: $.user_id
+          createdTime:
+            $var: $.add_time
+        fieldsToCollection:
+          content:
+            $var: $.description
+          org_id:
+            $var: $.companyId
+          user_id:
+            $var: $.ownerId
+          person_id:
+            $var: $.contactId
+          deal_id:
+            $var: $.dealId
+          lead_id:
+            $var: $.leadId
+          add_time:
+            $var: $.createdTime
+          id:
+            $var: $.id
+    defaultCollection:
+      key: activities
+  deal-products:
+    collectionMappings:
+      - key: deal-products
+        fieldsFromCollection:
+          name:
+            $var: $.name
+          quantity:
+            $var: $.quantity
+          price:
+            $var: $.item_price
+          dealId:
+            $var: $.deal_id
+          productId:
+            $var: $.product_id
+          isActive:
+            $var: $.active_flag
+          createdTime:
+            $var: $.add_time
+          updatedTime:
+            $var: $.last_edit
+        fieldsToCollection:
+          name:
+            $var: $.name
+          quantity:
+            $var: $.quantity
+          deal_id:
+            $var: $.dealId
+          product_id:
+            $var: $.productId
+          item_price:
+            $var: $.price
+          add_time:
+            $var: $.createdTime
+          last_edit:
+            $var: $.updatedTime
+          active_flag:
+            $var: $.isActive
+    defaultCollection:
+      key: deal-products
+  deals:
+    collectionMappings:
+      - key: deals
+        fieldsFromCollection:
+          id:
+            $var: $.id
+          name:
+            $var: title
+          amount:
+            $var: value
+          currency:
+            $var: currency
+          companyId:
+            $var: org_id
+          contactId:
+            $var: person_id
+          probability:
+            $var: probability
+          stageId:
+            $var: $.stage_id
+          status:
+            $var: status
+          type:
+            $var: renewal_type
+          closeTime:
+            $var: close_time
+          ownerId:
+            $var: user_id
+          createdTime:
+            $var: add_time
+          createdBy:
+            $var: creator_user_id
+          updatedTime:
+            $var: update_time
+          lastActivityTime:
+            $var: last_activity_date
+        fieldsToCollection:
+          id:
+            $var: $.id
+          title:
+            $var: $.name
+          user_id:
+            $var: $.ownerId
+          person_id:
+            $var: $.contactId
+          org_id:
+            $var: $.companyId
+          value:
+            $var: $.amount
+          currency:
+            $var: $.currency
+          probability:
+            $var: $.probability
+          renewal_type:
+            $var: $.type
+          stage_id:
+            $var: $.stageId
+          status:
+            $var: $.status
+          close_time:
+            $var: $.closeTime
+          creator_user_id:
+            $var: $.createdBy
+          add_time:
+            $var: $.createdTime
+          update_time:
+            $var: $.updatedTime
+          last_activity_date:
+            $var: $.lastActivityTime
+    defaultCollection:
+      key: deals
+  contacts:
+    collectionMappings:
+      - key: leads
+        fieldsFromCollection:
+          id:
+            $var: $.id
+          fullName:
+            $var: $.title
+          ownerId:
+            $var: $.owner_id
+          companyId:
+            $var: $.organization_id
+          source:
+            $var: $.source_name
+          createdTime:
+            $var: $.add_time
+          createdBy:
+            $var: $.creator_id
+          updatedTime:
+            $var: $.update_time
+        fieldsToCollection:
+          title:
+            $var: $.fullName
+          owner_id:
+            $var: $.ownerId
+          organization_id:
+            $var: $.companyId
+          source_name:
+            $var: $.source
+          add_time:
+            $var: $.createdTime
+          creator_id:
+            $var: $.createdBy
+          update_time:
+            $var: $.updatedTime
+          id:
+            $var: $.id
+      - key: persons
+        fieldsFromCollection:
+          id:
+            $var: $.id
+          fullName:
+            $var: $.name
+          firstName:
+            $var: $.first_name
+          lastName:
+            $var: $.last_name
+          primaryEmail:
+            $var: $.email
+          primaryPhone:
+            $var: $.phone
+          stage:
+            $var: $.marketing_status
+          companyName:
+            $var: $.org.name
+          companyId:
+            $var: $.org_id
+          ownerId:
+            $var: $.owner_id
+          createdBy:
+            $var: $.added_by_user_id
+          createdTime:
+            $var: $.add_time
+          updatedTime:
+            $var: $.update_time
+          lastActivityTime:
+            $var: $.last_activity_date
+        fieldsToCollection:
+          name:
+            $var: $.fullName
+          first_name:
+            $var: $.firstName
+          last_name:
+            $var: $.lastName
+          phones:
+            $var: $.phones
+          emails:
+            $var: $.emails
+          phone:
+            $var: $.primaryPhone
+          email:
+            $var: $.primaryEmail
+          owner_id:
+            $var: $.ownerId
+          org_id:
+            $var: $.companyId
+          org:
+            name:
+              $var: $.companyName
+          added_by_user_id:
+            $var: $.createdBy
+          add_time:
+            $var: $.createdTime
+          update_time:
+            $var: $.updatedTime
+          last_activity_date:
+            $var: $.lastActivityTime
+          id:
+            $var: $.id
+      - key: persons-by-filter
+        fieldsFromCollection:
+          fullName:
+            $var: $.name
+          firstName:
+            $var: $.first_name
+          lastName:
+            $var: $.last_name
+          primaryEmail:
+            $var: $.email
+          primaryPhone:
+            $var: $.phone
+          stage:
+            $var: $.marketing_status
+          companyName:
+            $var: $.org.name
+          companyId:
+            $var: $.org_id
+          ownerId:
+            $var: $.owner_id
+          createdBy:
+            $var: $.added_by_user_id
+          createdTime:
+            $var: $.add_time
+          updatedTime:
+            $var: $.update_time
+          lastActivityTime:
+            $var: $.last_activity_date
+        fieldsToCollection:
+          name:
+            $var: $.fullName
+          first_name:
+            $var: $.firstName
+          last_name:
+            $var: $.lastName
+          phones:
+            $var: $.phones
+          emails:
+            $var: $.emails
+          phone:
+            $var: $.primaryPhone
+          email:
+            $var: $.primaryEmail
+          owner_id:
+            $var: $.ownerId
+          org_id:
+            $var: $.companyId
+          org:
+            name:
+              $var: $.companyName
+          added_by_user_id:
+            $var: $.createdBy
+          add_time:
+            $var: $.createdTime
+          update_time:
+            $var: $.updatedTime
+          last_activity_date:
+            $var: $.lastActivityTime
+    defaultCollection:
+      key: persons
+  companies:
+    collectionMappings:
+      - key: organizations
+        fieldsFromCollection:
+          id:
+            $var: $.id
+          name:
+            $var: $.name
+          ownerId:
+            $var: $.owner_id
+          primaryAddress:
+            full:
+              $var: $.address
+            street:
+              $concat:
+                - $var: $.address_street_number
+                - ' '
+                - $var: $.address_route
+            country:
+              $var: $.address_country
+            zip:
+              $var: $.address_postal_code
+            city:
+              $var: $.address_locality
+            state:
+              $var: $.address_admin_area_level_1
+          createdTime:
+            $var: $.add_time
+          updatedTime:
+            $var: $.update_time
+          lastActivityTime:
+            $var: $.last_activity_date
+        fieldsToCollection:
+          name:
+            $var: $.name
+          owner_id:
+            $var: $.ownerId
+          address:
+            $var: $.primaryAddress.full
+          address_country:
+            $var: $.primaryAddress.country
+          address_postal_code:
+            $var: $.primaryAddress.zip
+          address_locality:
+            $var: $.primaryAddress.city
+          address_admin_area_level_1:
+            $var: $.primaryAddress.state
+          address_route:
+            $var: $.primaryAddress.street
+          add_time:
+            $var: $.createdTime
+          update_time:
+            $var: $.updatedTime
+          last_activity_date:
+            $var: $.lastActivityTime
+          id:
+            $var: $.id
+    defaultCollection:
+      key: organizations
+  products:
+    collectionMappings:
+      - key: products
+        fieldsFromCollection:
+          id:
+            $var: $.id
+          name:
+            $var: $.name
+          description:
+            $var: $.description
+          code:
+            $var: $.code
+          isActive:
+            $var: $.active_flag
+          type:
+            $var: $.category
+          createdTime:
+            $var: $.add_time
+          updatedTime:
+            $var: $.update_time
+        fieldsToCollection:
+          name:
+            $var: $.name
+          code:
+            $var: $.code
+          description:
+            $var: $.description
+          category:
+            $var: $.type
+          active_flag:
+            $var: $.isActive
+          add_time:
+            $var: $.createdTime
+          update_time:
+            $var: $.updatedTime
+          id:
+            $var: $.id
+    defaultCollection:
+      key: products
+  users:
+    collectionMappings:
+      - key: users
+        fieldsFromCollection:
+          id:
+            $var: $.id
+          fullName:
+            $var: $.name
+          firstName:
+            $firstName:
+              $var: $.name
+          lastName:
+            $lastName:
+              $var: $.name
+          primaryEmail:
+            $var: $.email
+          primaryPhone:
+            $var: $.phone
+          timezone:
+            $var: $.timezone_name
+          isActive:
+            $var: $.active_flag
+          roleId:
+            $var: $.role_id
+          createdTime:
+            $var: $.created
+          updatedTime:
+            $var: $.modified
+          imageUrl:
+            $var: $.icon_url
+        fieldsToCollection:
+          name:
+            $var: $.fullName
+          email:
+            $var: $.primaryEmail
+          phone:
+            $var: $.primaryPhone
+          timezone_name:
+            $var: $.timezone
+          active_flag:
+            $var: $.isActive
+          role_id:
+            $var: $.roleId
+          created:
+            $var: $.createdTime
+          modified:
+            $var: $.updatedTime
+          icon_url:
+            $var: $.imageUrl
+          id:
+            $var: $.id
+    defaultCollection:
+      key: users
+id: 644fe4efee0ebe0ca6e9746b
+uuid: acc155ee-9fba-4d64-908e-738a10111b42
+baseUri: s3://integration-app-connectors/public/e711dca9-8222-4087-95ba-3e22ddc56ac8
+revision: a6aea59d-9970-4ea3-9265-c4567ab2c5a4
+hasReadme: true
+status: production
+categories:
+  - CRM
+  - Sales
+udms:
+  - activities
+  - deal-products
+  - deals
+  - contacts
+  - companies
+  - products
+  - users
+isReadOnly: true
+popularity: 695
+appUuid: d6590751-95fc-43d1-be09-f88bdc28d31d
+dataCollectionsCount: 27
+operationsCount: 240
+eventsCount: 0
+version: 1.2.11

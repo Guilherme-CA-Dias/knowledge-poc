@@ -1,0 +1,90 @@
+key: contacts
+isDeactivated: false
+id: 67f696b98dc64db93eb4c86f
+name: Contacts
+archivedAt: null
+customized: false
+universalFieldMappingId: 67f696b88dc64db93eb4c852
+integrationId: 67f64cbbbdb16f2ecd4d2366
+dataSourceKey: contacts
+appSchema:
+  type: object
+  properties:
+    first_name:
+      type: string
+    last_name:
+      type: string
+    email:
+      type: string
+    phone:
+      type: string
+    id:
+      type: string
+direction: both
+defaultImportValue:
+  first_name:
+    $var: $.firstName
+  last_name:
+    $var: $.lastName
+  email:
+    $var: $.primaryEmail
+  phone:
+    $var: $.primaryPhone
+  id:
+    $var: $.id
+defaultExportValue:
+  firstName:
+    $var: $.first_name
+  lastName:
+    $var: $.last_name
+  primaryEmail:
+    $var: $.email
+  primaryPhone:
+    $var: $.phone
+exportValue:
+  firstname:
+    $var: $.first_name
+  lastname:
+    $var: $.last_name
+  email:
+    $var: $.email
+  phone:
+    $var: $.phone
+importValue:
+  first_name:
+    $var: $.firstname
+  last_name:
+    $var: $.lastname
+  email:
+    $var: $.email
+  phone:
+    $var: $.phone
+  id:
+    $var: $.hs_object_id
+integration:
+  key: hubspot
+  state: READY
+  errors: []
+  isDeactivated: false
+  id: 67f64cbbbdb16f2ecd4d2366
+  name: HubSpot
+  uuid: 3ca0d6ff-ba94-4437-ade2-8d57e1099d6d
+  connectorId: 62471fad996d5c297ae43f5f
+  hasDefaultParameters: false
+  hasMissingParameters: false
+  hasDocumentation: true
+  hasOperations: true
+  hasData: true
+  hasEvents: true
+  hasGlobalWebhooks: true
+  hasUdm: true
+  areParametersCustomized: false
+  baseUri: s3://integration-app-connectors/public/53c3d46c-09f2-407f-aec7-b03deb4f9eae
+  connectorVersion: 1.4.25
+  logoUri: https://static.integration.app/connectors/hubspot/logo.png
+  appUuid: c04f4af3-1704-4693-86a4-9af453205335
+  dataCollectionsCount: 31
+  operationsCount: 646
+  eventsCount: 1
+  authType: oauth2
+integrationKey: hubspot

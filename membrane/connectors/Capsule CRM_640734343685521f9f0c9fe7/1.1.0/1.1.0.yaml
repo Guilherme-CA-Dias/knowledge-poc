@@ -1,0 +1,571 @@
+name: Capsule CRM
+logoUri: https://static.integration.app/connectors/capsule-crm/logo.png
+key: capsule-crm
+parametersSchema:
+  type: object
+  properties:
+    clientId:
+      type: string
+    clientSecret:
+      type: string
+    scopes:
+      type: array
+      items:
+        type: string
+        enum:
+          - read
+          - write
+          - user_preference
+        allowCustom: true
+      default:
+        - read
+        - write
+        - user_preference
+apiDocsUri: https://developer.capsulecrm.com/v2/overview/getting-started
+auth:
+  type: oauth2
+  getOAuthConfig:
+    implementationType: javascript
+    filePath: auth/get-oauth-config.js
+  makeApiClient:
+    implementationType: mapping
+    filePath: auth/make-api-client.map.yml
+  getTokenData:
+    implementationType: javascript
+    filePath: auth/get-token-data.js
+  test:
+    implementationType: javascript
+    filePath: auth/test.js
+  enabled:
+    $eval:
+      $var: $.connectorParameters.clientId
+    isNotEmpty: true
+  options:
+    auth-proxy:
+      type: proxy
+      title: OAuth (via Integration.app)
+      proxyKey: capsule-crm
+      enabled:
+        $eval:
+          $var: $.connectorParameters.clientId
+        isEmpty: true
+  credentialsSchema:
+    type: object
+    properties:
+      access_token:
+        type: string
+        title: Access Token
+        description: Access token to use for API calls
+      refresh_token:
+        type: string
+        title: Refresh Token
+        description: Refresh token to use for API calls
+udm:
+  deals:
+    collectionMappings:
+      - key: opportunities
+        fieldsFromCollection:
+          id:
+            $var: $.id
+          name:
+            $var: $.name
+          amount:
+            $var: $.value.amount
+          currency:
+            $var: $.value.currency
+          description:
+            $var: $.description
+          stage:
+            $var: $.milestone
+          ownerId:
+            $var: $.owner
+          contactId:
+            $case:
+              cases:
+                - filter:
+                    $eval:
+                      $var: $.party.type
+                    is: person
+                  value:
+                    $var: $.party.id
+          companyId:
+            $case:
+              cases:
+                - filter:
+                    $eval:
+                      $var: $.party.type
+                    is: organisation
+                  value:
+                    $var: $.party.id
+          closeTime:
+            $var: $.closedOn
+          createdTime:
+            $var: $.createdAt
+          updatedTime:
+            $var: $.updatedAt
+          lastActivityTime:
+            $var: $.lastContactedAt
+          probability:
+            $var: $.probability
+        fieldsToCollection:
+          name:
+            $var: $.name
+          description:
+            $var: $.description
+          owner:
+            $var: $.ownerId
+          milestone:
+            $var: $.stage
+          value:
+            amount:
+              $var: $.amount
+            currency:
+              $var: $.currency
+          probability:
+            $var: $.probability
+          party:
+            $case:
+              cases:
+                - filter:
+                    $eval:
+                      $var: $.contactId
+                    isNotEmpty: true
+                  value:
+                    type: person
+                    id:
+                      $var: $.contactId
+                - filter:
+                    $eval:
+                      $var: $.companyId
+                    isNotEmpty: true
+                  value:
+                    type: organisation
+                    id:
+                      $var: $.companyId
+          closedOn:
+            $var: $.closeTime
+          lastContactedAt:
+            $var: $.lastActivityTime
+          createdAt:
+            $var: $.createdTime
+          updatedAt:
+            $var: $.updatedTime
+          id:
+            $var: $.id
+    defaultCollection:
+      key: opportunities
+  companies:
+    collectionMappings:
+      - key: organisations
+        fieldsFromCollection:
+          id:
+            $var: $.id
+          name:
+            $var: $.name
+          description:
+            $var: $.about
+          ownerId:
+            $var: $.owner
+          emails:
+            $iterate:
+              source:
+                $var: $.emailAddresses
+              item:
+                value:
+                  $var: $.item.address
+                type:
+                  $var: $.item.type
+          primaryEmail:
+            $var: $.emailAddresses[0].address
+          phones:
+            $iterate:
+              source:
+                $var: $.phoneNumbers
+              item:
+                value:
+                  $var: $.item.number
+                type:
+                  $var: $.item.type
+          primaryPhone:
+            $var: $.phoneNumbers[0].number
+          primaryAddress:
+            type:
+              $var: $.addresses[0].type
+            street:
+              $var: $.addresses[0].street
+            city:
+              $var: $.addresses[0].city
+            state:
+              $var: $.addresses[0].state
+            country:
+              $var: $.addresses[0].country
+            zip:
+              $var: $.addresses[0].zip
+          addresses:
+            $iterate:
+              source:
+                $var: $.addresses
+              item:
+                type:
+                  $var: $.item.type
+                street:
+                  $var: $.item.street
+                city:
+                  $var: $.item.city
+                state:
+                  $var: $.item.state
+                country:
+                  $var: $.item.country
+                zip:
+                  $var: $.item.zip
+          createdTime:
+            $var: $.createdAt
+          updatedTime:
+            $var: $.updatedAt
+          lastActivityTime:
+            $var: $.lastContactedAt
+        fieldsToCollection:
+          name:
+            $var: $.name
+          owner:
+            $var: $.ownerId
+          about:
+            $var: $.description
+          addresses:
+            $iterate:
+              source:
+                $var: $.addresses
+              item:
+                type:
+                  $var: $.item.type
+                street:
+                  $var: $.item.street
+                city:
+                  $var: $.item.city
+                state:
+                  $var: $.item.state
+                country:
+                  $var: $.item.country
+                zip:
+                  $var: $.item.zip
+          emailAddresses:
+            $iterate:
+              source:
+                $var: $.emails
+              item:
+                address:
+                  $var: $.item.value
+                type:
+                  $var: $.item.type
+          phoneNumbers:
+            $iterate:
+              source:
+                $var: $.phones
+              item:
+                number:
+                  $var: $.item.value
+                type:
+                  $var: $.item.type
+          createdAt:
+            $var: $.createdTime
+          updatedAt:
+            $var: $.updatedTime
+          lastContactedAt:
+            $var: $.lastActivityTime
+          id:
+            $var: $.id
+    defaultCollection:
+      key: organisations
+  contacts:
+    collectionMappings:
+      - key: people
+        fieldsFromCollection:
+          id:
+            $var: $.id
+          firstName:
+            $var: $.firstName
+          lastName:
+            $var: $.lastName
+          emails:
+            $iterate:
+              source:
+                $var: $.emailAddresses
+              item:
+                value:
+                  $var: $.item.address
+                type:
+                  $var: $.item.type
+          primaryEmail:
+            $var: $.emailAddresses[0].address
+          phones:
+            $iterate:
+              source:
+                $var: $.phoneNumbers
+              item:
+                value:
+                  $var: $.item.number
+                type:
+                  $var: $.item.type
+          primaryPhone:
+            $var: $.phoneNumbers[0].number
+          companyId:
+            $var: $.organisation
+          ownerId:
+            $var: $.owner
+          jobTitle:
+            $var: $.jobTitle
+          primaryAddress:
+            type:
+              $var: $.addresses[0].type
+            street:
+              $var: $.addresses[0].street
+            city:
+              $var: $.addresses[0].city
+            state:
+              $var: $.addresses[0].state
+            country:
+              $var: $.addresses[0].country
+            zip:
+              $var: $.addresses[0].zip
+          addresses:
+            $iterate:
+              source:
+                $var: $.addresses
+              item:
+                type:
+                  $var: $.item.type
+                street:
+                  $var: $.item.street
+                city:
+                  $var: $.item.city
+                state:
+                  $var: $.item.state
+                country:
+                  $var: $.item.country
+                zip:
+                  $var: $.item.zip
+          createdTime:
+            $var: $.createdAt
+          updatedTime:
+            $var: $.updatedAt
+          lastActivityTime:
+            $var: $.lastContactedAt
+        fieldsToCollection:
+          firstName:
+            $var: $.firstName
+          lastName:
+            $var: $.lastName
+          jobTitle:
+            $var: $.jobTitle
+          organisation:
+            $var: $.companyId
+          owner:
+            $var: $.ownerId
+          addresses:
+            $iterate:
+              source:
+                $var: $.addresses
+              item:
+                type:
+                  $var: $.item.type
+                street:
+                  $var: $.item.street
+                city:
+                  $var: $.item.city
+                state:
+                  $var: $.item.state
+                country:
+                  $var: $.item.country
+                zip:
+                  $var: $.item.zip
+          emailAddresses:
+            $iterate:
+              source:
+                $var: $.emails
+              item:
+                address:
+                  $var: $.item.value
+                type:
+                  $var: $.item.type
+          phoneNumbers:
+            $iterate:
+              source:
+                $var: $.phones
+              item:
+                number:
+                  $var: $.item.value
+                type:
+                  $var: $.item.type
+          createdAt:
+            $var: $.createdTime
+          updatedAt:
+            $var: $.updatedTime
+          lastContactedAt:
+            $var: $.lastActivityTime
+          id:
+            $var: $.id
+    defaultCollection:
+      key: people
+  tasks:
+    collectionMappings:
+      - key: tasks
+        fieldsFromCollection:
+          id:
+            $var: $.id
+          ownerId:
+            $var: $.owner
+          contactId:
+            $case:
+              cases:
+                - filter:
+                    $eval:
+                      $var: $.party.type
+                    is: person
+                  value:
+                    $var: $.party.id
+          companyId:
+            $case:
+              cases:
+                - filter:
+                    $eval:
+                      $var: $.party.type
+                    is: organisation
+                  value:
+                    $var: $.party.id
+          dealId:
+            $case:
+              cases:
+                - filter:
+                    $eval:
+                      $var: $.opportunity
+                    isNotEmpty: true
+                  value:
+                    $var: $.opportunity
+          dueTime:
+            $var: $.dueOn
+          endTime:
+            $var: $.completedAt
+          createdTime:
+            $var: $.createdAt
+          updatedTime:
+            $var: $.updatedAt
+          type:
+            $var: $.category
+          subject:
+            $var: $.description
+          content:
+            $var: $.detail
+        fieldsToCollection:
+          description:
+            $var: $.subject
+          category:
+            $var: $.type
+          detail:
+            $var: $.content
+          owner:
+            $var: $.ownerId
+          createdAt:
+            $var: $.createdTime
+          updatedAt:
+            $var: $.updatedTime
+          dueOn:
+            $var: $.dueTime
+          party:
+            $case:
+              cases:
+                - filter:
+                    $eval:
+                      $var: $.contactId
+                    isNotEmpty: true
+                  value:
+                    type: person
+                    id:
+                      $var: $.contactId
+                - filter:
+                    $eval:
+                      $var: $.companyId
+                    isNotEmpty: true
+                  value:
+                    type: organisation
+                    id:
+                      $var: $.companyId
+          opportunity:
+            $case:
+              cases:
+                - filter:
+                    $eval:
+                      $var: $.dealId
+                    isNotEmpty: true
+                  value:
+                    id:
+                      $var: $.dealId
+          id:
+            $var: $.id
+    defaultCollection:
+      key: tasks
+  users:
+    collectionMappings:
+      - key: users
+        fieldsFromCollection:
+          id:
+            $var: $.id
+          fullName:
+            $var: $.name
+          userName:
+            $var: $.username
+          firstName:
+            $firstName:
+              $var: $.name
+          lastName:
+            $lastName:
+              $var: $.name
+          primaryEmail:
+            $var: $.party.emailAddresses[0].address
+          primaryPhone:
+            $var: $.party.phoneNumbers[0].number
+          timezone:
+            $var: $.timezone
+          imageUrl:
+            $var: $.pictureURL
+        fieldsToCollection:
+          name:
+            $var: $.fullName
+          party:
+            emailAddresses:
+              - address:
+                  $var: $.primaryEmail
+            phoneNumbers:
+              - number:
+                  $var: $.primaryPhone
+          username:
+            $var: $.userName
+          timezone:
+            $var: $.timezone
+          pictureURL:
+            $var: $.imageUrl
+          id:
+            $var: $.id
+    defaultCollection:
+      key: users
+id: 640734343685521f9f0c9fe7
+uuid: cc8e70a4-4585-43a8-92fc-9085cc156cc2
+baseUri: s3://integration-app-connectors/public/6c498f16-6d4a-4507-9766-88b61113c409
+revision: c546bb60-ac22-47d8-8065-d287c0ee2de2
+hasReadme: false
+status: production
+categories:
+  - CRM
+  - Sales
+udms:
+  - deals
+  - companies
+  - contacts
+  - tasks
+  - users
+isReadOnly: true
+popularity: 197
+appUuid: 262e86b2-0cdd-49e5-ab15-bbf7d3fb35c2
+dataCollectionsCount: 7
+operationsCount: 10
+eventsCount: 0
+version: 1.1.0

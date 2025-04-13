@@ -1,0 +1,133 @@
+key: receive-contact-events
+id: 67f696bd8dc64db93eb4c994
+name: Receive Contact Events
+isDeactivated: false
+universalFlowId: 67f696bc8dc64db93eb4c904
+integrationId: 67f696b68dc64db93eb4c742
+integration:
+  key: pipedrive
+  state: READY
+  errors: []
+  isDeactivated: false
+  id: 67f696b68dc64db93eb4c742
+  name: Pipedrive
+  uuid: 9e47d302-5c9e-4264-9c9d-abcfc1594d98
+  connectorId: 644fe4efee0ebe0ca6e9746b
+  hasDefaultParameters: false
+  hasMissingParameters: false
+  hasDocumentation: true
+  hasOperations: true
+  hasData: true
+  hasEvents: false
+  hasGlobalWebhooks: false
+  hasUdm: true
+  areParametersCustomized: false
+  baseUri: s3://integration-app-connectors/public/4b559110-a271-4e58-ae67-1a4bf472f99e
+  connectorVersion: 1.2.11
+  logoUri: https://static.integration.app/connectors/pipedrive-oauth/logo.png
+  dataCollectionsCount: 27
+  operationsCount: 240
+  eventsCount: 0
+  authType: oauth2
+nodes:
+  contact-created-trigger:
+    type: data-record-created-trigger
+    name: Contact Created Trigger
+    config:
+      dataSource:
+        key: contacts
+      fieldMapping: {}
+    links:
+      - key: get-all-contact-fields-by-id
+  contact-updated-trigger:
+    type: data-record-updated-trigger
+    name: Contact Updated Trigger
+    config:
+      dataSource:
+        key: contacts
+      fieldMapping: {}
+    links:
+      - key: get-all-contact-fields-by-id2
+  get-all-contact-fields-by-id:
+    type: find-data-record-by-id
+    name: Get all Contact fields by Id
+    config:
+      dataSource:
+        key: contacts
+      fieldMapping:
+        key: contacts
+        includeRawFields: true
+      id:
+        $var: $.input.contact-created-trigger.record.id
+    links:
+      - key: create-contact-in-my-app
+  get-all-contact-fields-by-id2:
+    type: find-data-record-by-id
+    name: Get all Contact fields by Id
+    config:
+      dataSource:
+        key: contacts
+      id:
+        $var: $.input.contact-updated-trigger.record.id
+      fieldMapping:
+        key: contacts
+        includeRawFields: false
+    links:
+      - key: update-contact-in-my-app
+  create-contact-in-my-app:
+    type: api-request-to-your-app
+    name: Create Contact in my App
+    config:
+      request:
+        body:
+          externalContactId:
+            $var: $.input.get-all-contact-fields-by-id.id
+          data:
+            $var: $.input.get-all-contact-fields-by-id
+          userId:
+            $var: $.user.id
+        uri: /api/webhook
+        method: POST
+    links: []
+  update-contact-in-my-app:
+    type: api-request-to-your-app
+    name: Update Contact in my App
+    config:
+      request:
+        body:
+          externalContactId:
+            $var: $.input.get-all-contact-fields-by-id2.id
+          data:
+            $var: $.input.get-all-contact-fields-by-id2
+          userId:
+            $var: $.user.id
+        uri: /api/webhook
+        method: POST
+    links: []
+  delete-contact-in-my-app:
+    type: api-request-to-your-app
+    name: Delete Contact from My App
+    config:
+      request:
+        body:
+          externalContactId:
+            $var: $.input.contact-deleted-trigger.record.id
+          userId:
+            $var: $.user.id
+          externalContactDeleted: true
+        method: POST
+        uri: /api/webhook
+    links: []
+  contact-deleted-trigger:
+    type: data-record-deleted-trigger
+    name: Contact Deleted Trigger
+    config:
+      dataSource:
+        key: contacts
+      fieldMapping: {}
+    links:
+      - key: delete-contact-in-my-app
+autoCreateInstances: false
+customized: false
+isDeployed: true
+integrationKey: pipedrive

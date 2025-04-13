@@ -1,0 +1,1167 @@
+name: HubSpot
+logoUri: https://static.integration.app/connectors/hubspot/logo.png
+key: hubspot
+parametersSchema:
+  type: object
+  properties:
+    clientId:
+      type: string
+    clientSecret:
+      type: string
+    scopes:
+      type: array
+      items:
+        type: string
+        allowCustom: true
+        enum:
+          - oauth
+          - cms.domains.read
+          - cms.domains.write
+          - cms.functions.read
+          - cms.functions.write
+          - cms.knowledge_base.articles.read
+          - cms.knowledge_base.articles.write
+          - cms.knowledge_base.articles.publish
+          - cms.knowledge_base.settings.read
+          - cms.knowledge_base.settings.write
+          - cms.performance.read
+          - crm.lists.read
+          - crm.lists.write
+          - crm.objects.companies.read
+          - crm.objects.companies.write
+          - crm.objects.contacts.read
+          - crm.objects.contacts.write
+          - crm.objects.custom.read
+          - crm.objects.custom.write
+          - crm.objects.deals.read
+          - crm.objects.deals.write
+          - crm.objects.feedback_submissions.read
+          - crm.objects.goals.read
+          - crm.objects.line_items.read
+          - crm.objects.line_items.write
+          - crm.objects.marketing_events.read
+          - crm.objects.marketing_events.write
+          - crm.objects.owners.read
+          - crm.objects.quotes.read
+          - crm.objects.quotes.write
+          - crm.schemas.companies.read
+          - crm.schemas.companies.write
+          - crm.schemas.contacts.read
+          - crm.schemas.contacts.write
+          - crm.schemas.custom.read
+          - crm.schemas.deals.read
+          - crm.schemas.deals.write
+          - crm.schemas.line_items.read
+          - crm.schemas.quotes.read
+          - settings.billing.write
+          - settings.currencies.read
+          - settings.currencies.write
+          - settings.users.read
+          - settings.users.write
+          - settings.users.teams.read
+          - settings.users.teams.write
+          - account-info.security.read
+          - accounting
+          - actions
+          - analytics.behavioral_events.send
+          - automation
+          - behavioral_events.event_definitions.read_write
+          - business_units_view.read
+          - business-intelligence
+          - collector.graphql_query.execute
+          - collector.graphql_schema.read
+          - communication_preferences.read
+          - communication_preferences.read_write
+          - communication_preferences.write
+          - content
+          - conversations.read
+          - conversations.visitor_identification.tokens.create
+          - conversations.write
+          - crm.export
+          - crm.import
+          - ctas.read
+          - e-commerce
+          - external_integrations.forms.access
+          - files
+          - files.ui_hidden.read
+          - forms
+          - forms-uploaded-files
+          - hubdb
+          - integration-sync
+          - media_bridge.read
+          - media_bridge.write
+          - sales-email-read
+          - social
+          - tickets
+          - timeline
+          - transactional-email
+    optionalScopes:
+      type: array
+      items:
+        type: string
+        allowCustom: true
+        enum:
+          - cms.domains.read
+          - cms.domains.write
+          - cms.functions.read
+          - cms.functions.write
+          - cms.knowledge_base.articles.read
+          - cms.knowledge_base.articles.write
+          - cms.knowledge_base.articles.publish
+          - cms.knowledge_base.settings.read
+          - cms.knowledge_base.settings.write
+          - cms.performance.read
+          - crm.lists.read
+          - crm.lists.write
+          - crm.objects.companies.read
+          - crm.objects.companies.write
+          - crm.objects.contacts.read
+          - crm.objects.contacts.write
+          - crm.objects.custom.read
+          - crm.objects.custom.write
+          - crm.objects.deals.read
+          - crm.objects.deals.write
+          - crm.objects.feedback_submissions.read
+          - crm.objects.goals.read
+          - crm.objects.line_items.read
+          - crm.objects.line_items.write
+          - crm.objects.marketing_events.read
+          - crm.objects.marketing_events.write
+          - crm.objects.owners.read
+          - crm.objects.quotes.read
+          - crm.objects.quotes.write
+          - crm.schemas.companies.read
+          - crm.schemas.companies.write
+          - crm.schemas.contacts.read
+          - crm.schemas.contacts.write
+          - crm.schemas.custom.read
+          - crm.schemas.deals.read
+          - crm.schemas.deals.write
+          - crm.schemas.line_items.read
+          - crm.schemas.quotes.read
+          - settings.billing.write
+          - settings.currencies.read
+          - settings.currencies.write
+          - settings.users.read
+          - settings.users.write
+          - settings.users.teams.read
+          - settings.users.teams.write
+          - account-info.security.read
+          - accounting
+          - actions
+          - analytics.behavioral_events.send
+          - automation
+          - behavioral_events.event_definitions.read_write
+          - business_units_view.read
+          - business-intelligence
+          - collector.graphql_query.execute
+          - collector.graphql_schema.read
+          - communication_preferences.read
+          - communication_preferences.read_write
+          - communication_preferences.write
+          - content
+          - conversations.read
+          - conversations.visitor_identification.tokens.create
+          - conversations.write
+          - crm.export
+          - crm.import
+          - ctas.read
+          - e-commerce
+          - external_integrations.forms.access
+          - files
+          - files.ui_hidden.read
+          - forms
+          - forms-uploaded-files
+          - hubdb
+          - integration-sync
+          - media_bridge.read
+          - media_bridge.write
+          - sales-email-read
+          - social
+          - tickets
+          - timeline
+          - transactional-email
+connectionMode: popup
+auth:
+  type: oauth2
+  makeApiClient:
+    implementationType: mapping
+    filePath: auth/make-api-client.map.yml
+  test:
+    implementationType: javascript
+    filePath: auth/test.js
+  getOAuthConfig:
+    implementationType: javascript
+    filePath: auth/get-oauth-config.js
+  getCredentialsFromTokenResponse:
+    implementationType: javascript
+  enabled:
+    $eval:
+      $var: $.connectorParameters.clientId
+    isNotEmpty: true
+  options:
+    auth-proxy:
+      type: proxy
+      title: OAuth (via Integration.app)
+      proxyKey: hubspot
+      enabled:
+        $eval:
+          $var: $.connectorParameters.clientId
+        isEmpty: true
+  getCredentialsFromAccessTokenResponse:
+    implementationType: javascript
+    filePath: auth/get-credentials-from-access-token-response.js
+  credentialsSchema:
+    type: object
+    properties:
+      access_token:
+        type: string
+        title: Access Token
+        description: Access token to use for API calls
+      refresh_token:
+        type: string
+        title: Refresh Token
+        description: Refresh token to use for API calls
+apiDocsUri: https://developers.hubspot.com/docs/api/overview
+appUri: https://www.hubspot.com/
+api:
+  type: openapi
+udm:
+  activities:
+    collectionMappings:
+      - key: calls
+        fieldsFromCollection:
+          id:
+            $var: hs_object_id
+          title:
+            $var: hs_call_title
+          description:
+            $var: hs_call_body
+          type:
+            $var: hs_activity_type
+          durationSeconds:
+            $var: hs_call_duration
+          status:
+            $var: hs_call_status
+          ownerId:
+            $var: hubspot_owner_id
+          createdTime:
+            $var: hs_timestamp
+          createdBy:
+            $var: hs_created_by_user_id
+          updatedTime:
+            $var: hs_lastmodifieddate
+          updatedBy:
+            $var: hs_updated_by_user_id
+          companyId:
+            $var: company_ids[0]
+          contactId:
+            $var: contact_ids[0]
+          dealId:
+            $var: deal_ids[0]
+        fieldsToCollection:
+          hs_call_title:
+            $var: title
+          hs_call_body:
+            $var: description
+          hs_activity_type:
+            $var: type
+          hs_call_duration:
+            $var: durationSeconds
+          hs_call_status:
+            $var: status
+          hubspot_owner_id:
+            $var: ownerId
+          hs_timestamp:
+            $var: createdTime
+          hs_created_by_user_id:
+            $var: createdBy
+          hs_lastmodifieddate:
+            $var: updatedTime
+          hs_updated_by_user_id:
+            $var: updatedBy
+          company_ids:
+            - $var: companyId
+          contact_ids:
+            - $var: contactId
+          deal_ids:
+            - $var: dealId
+          id:
+            $var: $.id
+          hs_call_summary:
+            $var: $.description
+          hs_object_id:
+            $var: $.id
+      - key: emails
+        fieldsFromCollection:
+          id:
+            $var: $.hs_object_id
+          title:
+            $var: hs_email_subject
+          description:
+            $var: $.hs_email_text
+          type:
+            $var: hs_email_direction
+          status:
+            $var: hs_email_status
+          ownerId:
+            $var: hubspot_owner_id
+          startTime:
+            $var: $.hs_timestamp
+          createdTime:
+            $var: $.hs_createdate
+          createdBy:
+            $var: hs_created_by_user_id
+          updatedTime:
+            $var: hs_lastmodifieddate
+          updatedBy:
+            $var: hs_updated_by_user_id
+        fieldsToCollection:
+          hs_updated_by_user_id:
+            $var: updatedBy
+          hs_email_text:
+            $var: $.description
+          hs_created_by_user_id:
+            $var: createdBy
+          hubspot_owner_id:
+            $var: ownerId
+          hs_timestamp:
+            $var: $.startTime
+          hs_lastmodifieddate:
+            $var: updatedTime
+          hs_email_subject:
+            $var: title
+          hs_email_status:
+            $var: status
+          hs_email_direction:
+            $var: type
+          hs_createdate:
+            $var: $.createdTime
+      - key: notes
+        fieldsFromCollection:
+          id:
+            $var: $.hs_object_id
+          contactId:
+            $var: contact_ids[0]
+          companyId:
+            $var: company_ids[0]
+          dealId:
+            $var: deal_ids[0]
+          ownerId:
+            $var: hubspot_owner_id
+          createdTime:
+            $var: hs_timestamp
+          createdBy:
+            $var: hs_created_by_user_id
+          updatedTime:
+            $var: hs_lastmodifieddate
+          updatedBy:
+            $var: hs_updated_by_user_id
+        fieldsToCollection:
+          hs_note_body:
+            $var: content
+          hubspot_owner_id:
+            $var: ownerId
+          hs_timestamp:
+            $var: createdTime
+          hs_created_by_user_id:
+            $var: createdBy
+          hs_lastmodifieddate:
+            $var: updatedTime
+          hs_updated_by_user_id:
+            $var: updatedBy
+          company_ids:
+            - $var: companyId
+          contact_ids:
+            - $var: contactId
+          deal_ids:
+            - $var: dealId
+          id:
+            $var: $.id
+    defaultCollection:
+      key: notes
+  companies:
+    collectionMappings:
+      - key: companies
+        fieldsFromCollection:
+          id:
+            $var: $.hs_object_id
+          name:
+            $var: $.name
+          websiteUrl:
+            $var: $.website
+          primaryPhone:
+            $var: $.phone
+          description:
+            $var: $.description
+          industry:
+            $var: $.industry
+          ownerId:
+            $var: $.hubspot_owner_id
+          primaryAddress:
+            full:
+              $concat:
+                values:
+                  - $var: $.address
+                  - $var: $.city
+                  - $var: $.state
+                  - $var: $.country
+                  - $var: $.zip
+                delimiter: ' '
+            street:
+              $var: $.address
+            city:
+              $var: $.city
+            state:
+              $var: $.state
+            country:
+              $var: $.country
+            zip:
+              $var: $.zip
+          createdTime:
+            $var: $.createdate
+          createdBy:
+            $var: $.hs_created_by_user_id
+          updatedTime:
+            $var: $.hs_lastmodifieddate
+          updatedBy:
+            $var: $.hs_updated_by_user_id
+        fieldsToCollection:
+          hs_object_id:
+            $var: $.id
+          name:
+            $var: $.name
+          website:
+            $var: $.websiteUrl
+          hubspot_owner_id:
+            $var: $.ownerId
+          phone:
+            $var: $.primaryPhone
+          description:
+            $var: $.description
+          industry:
+            $var: $.industry
+          address:
+            $var: $.primaryAddress.street
+          city:
+            $var: $.primaryAddress.city
+          state:
+            $var: $.primaryAddress.state
+          country:
+            $var: $.primaryAddress.country
+          zip:
+            $var: $.primaryAddress.zip
+          hs_created_by_user_id:
+            $var: $.createdBy
+          hs_updated_by_user_id:
+            $var: $.updatedBy
+    defaultCollection:
+      key: companies
+  contacts:
+    collectionMappings:
+      - key: contacts
+        fieldsFromCollection:
+          id:
+            $var: $.hs_object_id
+          fullName:
+            $concat:
+              values:
+                - $var: $.firstname
+                - $var: $.lastname
+              delimiter: ' '
+          firstName:
+            $var: $.firstname
+          lastName:
+            $var: $.lastname
+          primaryEmail:
+            $var: $.email
+          primaryPhone:
+            $var: $.phone
+          primaryAddress:
+            street:
+              $var: $.address
+            city:
+              $var: $.city
+            state:
+              $var: $.state
+            country:
+              $var: $.country
+            zip:
+              $var: $.zip
+          stage:
+            $var: $.lifecyclestage
+          companyName:
+            $var: $.company
+          ownerId:
+            $var: $.hubspot_owner_id
+          jobTitle:
+            $var: $.jobtitle
+          source:
+            $var: $.hs_latest_source
+          createdTime:
+            $var: $.createdate
+          createdBy:
+            $var: $.hs_created_by_user_id
+          updatedTime:
+            $var: $.lastmodifieddate
+          updatedBy:
+            $var: $.hs_updated_by_user_id
+          companyId:
+            $firstNotEmpty:
+              - $var: $.company_ids[0]
+              - $var: $.associatedcompanyid
+        fieldsToCollection:
+          hs_object_id:
+            $var: $.id
+          firstname:
+            $var: $.firstName
+          lastname:
+            $var: $.lastName
+          email:
+            $var: $.primaryEmail
+          phone:
+            $var: $.primaryPhone
+          jobtitle:
+            $var: $.jobTitle
+          company:
+            $var: $.companyName
+          lifecyclestage:
+            $var: $.stage
+          associatedcompanyid:
+            $var: $.companyId
+          company_ids:
+            - $var: $.companyId
+          hubspot_owner_id:
+            $var: $.ownerId
+          address:
+            $var: $.primaryAddress.street
+          city:
+            $var: $.primaryAddress.city
+          state:
+            $var: $.primaryAddress.state
+          country:
+            $var: $.primaryAddress.country
+          zip:
+            $var: $.primaryAddress.zip
+          hs_latest_source:
+            $var: $.source
+      - key: contacts-in-list
+        fieldsFromCollection:
+          id:
+            $var: $.hs_object_id
+          fullName:
+            $concat:
+              values:
+                - $var: $.firstname
+                - $var: $.lastname
+              delimiter: ' '
+          firstName:
+            $var: $.firstname
+          lastName:
+            $var: $.lastname
+          primaryEmail:
+            $var: $.email
+          primaryPhone:
+            $var: $.phone
+          primaryAddress:
+            street:
+              $var: $.address
+            city:
+              $var: $.city
+            state:
+              $var: $.state
+            country:
+              $var: $.country
+            zip:
+              $var: $.zip
+          stage:
+            $var: $.lifecyclestage
+          companyName:
+            $var: $.company
+          companyId:
+            $firstNotEmpty:
+              - $var: $.company_ids[0]
+              - $var: $.associatedcompanyid
+          ownerId:
+            $var: $.hubspot_owner_id
+          jobTitle:
+            $var: $.jobtitle
+          source:
+            $var: $.hs_latest_source
+          createdTime:
+            $var: $.createdate
+          createdBy:
+            $var: $.hs_created_by_user_id
+          updatedTime:
+            $var: $.lastmodifieddate
+          updatedBy:
+            $var: $.hs_updated_by_user_id
+        fieldsToCollection:
+          hs_object_id:
+            $var: $.id
+          firstname:
+            $var: $.firstName
+          lastname:
+            $var: $.lastName
+          email:
+            $var: $.primaryEmail
+          phone:
+            $var: $.primaryPhone
+          jobtitle:
+            $var: $.jobTitle
+          company:
+            $var: $.companyName
+          lifecyclestage:
+            $var: $.stage
+          associatedcompanyid:
+            $var: $.companyId
+          company_ids:
+            - $var: $.companyId
+          hubspot_owner_id:
+            $var: $.ownerId
+          address:
+            $var: $.primaryAddress.street
+          city:
+            $var: $.primaryAddress.city
+          state:
+            $var: $.primaryAddress.state
+          country:
+            $var: $.primaryAddress.country
+          zip:
+            $var: $.primaryAddress.zip
+          hs_latest_source:
+            $var: $.source
+    defaultCollection:
+      key: contacts
+  deals:
+    collectionMappings:
+      - key: deals
+        fieldsFromCollection:
+          id:
+            $var: $.hs_object_id
+          name:
+            $var: $.dealname
+          amount:
+            $var: $.amount
+          companyId:
+            $var: $.company_ids[0]
+          contactId:
+            $var: $.contact_ids[0]
+          source:
+            $var: $.hs_analytics_source
+          description:
+            $var: $.description
+          stage:
+            $var: $.dealstage
+          type:
+            $var: $.dealtype
+          ownerId:
+            $var: $.hubspot_owner_id
+          probability:
+            $var: $.hs_forecast_probability
+          closeTime:
+            $var: $.closedate
+          createdTime:
+            $var: $.createdate
+          createdBy:
+            $var: $.hs_created_by_user_id
+          updatedTime:
+            $var: $.hs_lastmodifieddate
+          updatedBy:
+            $var: $.hs_updated_by_user_id
+        fieldsToCollection:
+          hs_object_id:
+            $var: $.id
+          dealname:
+            $var: $.name
+          description:
+            $var: $.description
+          contact_ids:
+            - $var: $.contactId
+          company_ids:
+            - $var: $.companyId
+          dealstage:
+            $var: $.stage
+          amount:
+            $var: $.amount
+          closedate:
+            $var: $.closeTime
+          hubspot_owner_id:
+            $var: $.ownerId
+          hs_forecast_probability:
+            $var: $.probability
+      - key: deals-by-pipeline
+        fieldsFromCollection:
+          id:
+            $var: id
+          name:
+            $var: $.dealname
+          amount:
+            $var: $.amount
+          source:
+            $var: $.hs_analytics_source
+          stage:
+            $var: $.dealstage
+          ownerId:
+            $var: $.hubspot_owner_id
+          description:
+            $var: $.description
+          type:
+            $var: $.dealtype
+          closeTime:
+            $var: $.closedate
+          createdTime:
+            $var: $.createdate
+          createdBy:
+            $var: $.hs_created_by_user_id
+          updatedTime:
+            $var: $.hs_lastmodifieddate
+          updatedBy:
+            $var: $.hs_updated_by_user_id
+          lastActivityTime:
+            $var: $.notes_last_updated
+          probability:
+            $var: $.hs_forecast_probability
+          contactId:
+            $var: $.contact_ids[0]
+          companyId:
+            $var: $.company_ids[0]
+        fieldsToCollection:
+          amount:
+            $var: $.amount
+          dealname:
+            $var: $.name
+          dealstage:
+            $var: $.stage
+          hubspot_owner_id:
+            $var: $.ownerId
+          hs_analytics_source:
+            $var: $.source
+          hs_forecast_probability:
+            $var: $.probability
+          closedate:
+            $var: $.closeTime
+          createdate:
+            $var: $.createdTime
+          description:
+            $var: $.description
+          dealtype:
+            $var: $.type
+          contact_ids:
+            - $var: $.contactId
+          company_ids:
+            - $var: $.companyId
+          id:
+            $var: $.id
+    defaultCollection:
+      key: deals
+  meetings:
+    collectionMappings:
+      - key: meetings
+        fieldsFromCollection:
+          id:
+            $var: $.hs_object_id
+          title:
+            $var: hs_meeting_title
+          description:
+            $var: hs_meeting_body
+          location:
+            $var: hs_meeting_location
+          participants:
+            $iterate:
+              source:
+                $var: $.contact_ids
+              item:
+                contactId:
+                  $var: $.item
+          status:
+            $var: hs_meeting_outcome
+          contactId:
+            $var: contact_ids[0]
+          companyId:
+            $var: company_ids[0]
+          dealId:
+            $var: deal_ids[0]
+          ownerId:
+            $var: hubspot_owner_id
+          startTime:
+            $var: hs_meeting_start_time
+          endTime:
+            $var: hs_meeting_end_time
+          createdTime:
+            $var: hs_timestamp
+          createdBy:
+            $var: hs_created_by_user_id
+          updatedTime:
+            $var: hs_lastmodifieddate
+          updatedBy:
+            $var: hs_updated_by_user_id
+        fieldsToCollection:
+          hs_updated_by_user_id:
+            $var: updatedBy
+          hs_object_id:
+            $var: $.id
+          hs_created_by_user_id:
+            $var: createdBy
+          hubspot_owner_id:
+            $var: ownerId
+          hs_timestamp:
+            $var: createdTime
+          hs_meeting_title:
+            $var: title
+          hs_meeting_start_time:
+            $var: startTime
+          hs_meeting_outcome:
+            $var: status
+          hs_meeting_location:
+            $var: location
+          hs_meeting_end_time:
+            $var: endTime
+          hs_meeting_body:
+            $var: description
+          hs_lastmodifieddate:
+            $var: updatedTime
+          contact_ids:
+            $iterate:
+              source:
+                $var: $.participants
+              item:
+                $var: $.item.contactId
+          deal_ids:
+            - $var: dealId
+          company_ids:
+            - $var: companyId
+    defaultCollection:
+      key: meetings
+  notes:
+    collectionMappings:
+      - key: notes
+        fieldsFromCollection:
+          id:
+            $var: $.hs_object_id
+          content:
+            $var: hs_note_body
+          ownerId:
+            $var: hubspot_owner_id
+          contactId:
+            $var: contact_ids[0]
+          companyId:
+            $var: company_ids[0]
+          dealId:
+            $var: deal_ids[0]
+          createdTime:
+            $var: hs_timestamp
+          createdBy:
+            $var: hs_created_by_user_id
+          updatedTime:
+            $var: hs_lastmodifieddate
+          updatedBy:
+            $var: hs_updated_by_user_id
+        fieldsToCollection:
+          hs_object_id:
+            $var: $.id
+          hubspot_owner_id:
+            $var: ownerId
+          hs_timestamp:
+            $var: createdTime
+          hs_note_body:
+            $var: content
+          hs_lastmodifieddate:
+            $var: updatedTime
+          company_ids:
+            - $var: companyId
+          contact_ids:
+            - $var: contactId
+          deal_ids:
+            - $var: dealId
+    defaultCollection:
+      key: notes
+  users:
+    collectionMappings:
+      - key: owners
+        fieldsFromCollection:
+          id:
+            $var: id
+          fullName:
+            $concat:
+              values:
+                - $var: $.firstName
+                - $var: $.lastName
+              delimiter: ' '
+          firstName:
+            $var: $.firstName
+          lastName:
+            $var: $.lastName
+          primaryEmail:
+            $var: $.email
+          createdTime:
+            $var: $.createdAt
+          updatedTime:
+            $var: $.updatedAt
+        fieldsToCollection:
+          email:
+            $var: $.primaryEmail
+          firstName:
+            $var: $.firstName
+          lastName:
+            $var: $.lastName
+          createdAt:
+            $var: $.createdTime
+          updatedAt:
+            $var: $.updatedTime
+          id:
+            $var: $.id
+      - key: users
+        fieldsFromCollection:
+          id:
+            $var: $.id
+          primaryEmail:
+            $var: $.email
+          roleId:
+            $var: $.roleId
+        fieldsToCollection:
+          email:
+            $var: $.primaryEmail
+          roleId:
+            $var: $.roleId
+          id:
+            $var: $.id
+    defaultCollection:
+      key: owners
+  tasks:
+    collectionMappings:
+      - key: tasks
+        fieldsFromCollection:
+          id:
+            $var: $.hs_object_id
+          subject:
+            $var: hs_task_subject
+          content:
+            $var: hs_task_body
+          status:
+            $var: hs_task_status
+          type:
+            $var: hs_task_type
+          ownerId:
+            $var: hubspot_owner_id
+          contactId:
+            $var: contact_ids[0]
+          companyId:
+            $var: company_ids[0]
+          dealId:
+            $var: deal_ids[0]
+          endTime:
+            $var: hs_task_completion_date
+          createdTime:
+            $var: hs_timestamp
+          createdBy:
+            $var: hs_created_by_user_id
+          updatedTime:
+            $var: hs_lastmodifieddate
+          updatedBy:
+            $var: hs_updated_by_user_id
+        fieldsToCollection:
+          hs_object_id:
+            $var: $.id
+          hs_updated_by_user_id:
+            $var: updatedBy
+          hs_created_by_user_id:
+            $var: createdBy
+          hubspot_owner_id:
+            $var: ownerId
+          hs_timestamp:
+            $var: createdTime
+          hs_task_type:
+            $var: type
+          hs_task_subject:
+            $var: subject
+          hs_task_status:
+            $var: status
+          hs_task_completion_date:
+            $var: endTime
+          hs_task_body:
+            $var: content
+          hs_lastmodifieddate:
+            $var: updatedTime
+          company_ids:
+            - $var: companyId
+          contact_ids:
+            - $var: contactId
+          deal_ids:
+            - $var: dealId
+    defaultCollection:
+      key: tasks
+  campaigns:
+    collectionMappings:
+      - key: marketing-events
+        fieldsFromCollection:
+          id:
+            $var: $.externalEventId
+          name:
+            $var: eventName
+          description:
+            $var: eventDescription
+          type:
+            $var: eventType
+          startTime:
+            $var: startDateTime
+          endTime:
+            $var: endDateTime
+          createdTime:
+            $var: createdAt
+          updatedTime:
+            $var: updatedAt
+          ownerId:
+            $var: $.externalAccountId
+        fieldsToCollection:
+          externalEventId:
+            $var: $.id
+          eventName:
+            $var: name
+          eventType:
+            $var: type
+          startDateTime:
+            $var: startTime
+          endDateTime:
+            $var: endTime
+          eventDescription:
+            $var: description
+          createdAt:
+            $var: createdTime
+          updatedAt:
+            $var: updatedTime
+          externalAccountId:
+            $var: $.ownerId
+    defaultCollection:
+      key: marketing-events
+  emails:
+    collectionMappings:
+      - key: emails
+        fieldsFromCollection:
+          id:
+            $var: hs_object_id
+          subject:
+            $var: hs_email_subject
+          body:
+            $var: hs_email_html
+          status:
+            $var: hs_email_status
+          ownerId:
+            $var: hubspot_owner_id
+          createdTime:
+            $var: hs_createdate
+          createdBy:
+            $var: hs_created_by_user_id
+          updatedTime:
+            $var: hs_lastmodifieddate
+          updatedBy:
+            $var: hs_updated_by_user_id
+        fieldsToCollection:
+          hs_object_id:
+            $var: id
+          hs_updated_by_user_id:
+            $var: updatedBy
+          hs_email_html:
+            $var: body
+          hs_created_by_user_id:
+            $var: createdBy
+          hubspot_owner_id:
+            $var: ownerId
+          hs_lastmodifieddate:
+            $var: $.updatedTime
+          hs_email_subject:
+            $var: subject
+          hs_email_status:
+            $var: status
+          hs_createdate:
+            $var: $.createdTime
+    defaultCollection:
+      key: emails
+  deal-stages:
+    collectionMappings:
+      - key: pipeline-stages
+        fieldsFromCollection:
+          id:
+            $var: $.id
+          name:
+            $var: $.label
+          state:
+            $case:
+              cases:
+                - filter:
+                    $and:
+                      - $eval:
+                          $var: $.metadata.isClosed
+                        is: 'true'
+                      - $eval:
+                          $var: $.metadata.probability
+                        is: '1.0'
+                  value: won
+                - filter:
+                    $and:
+                      - $eval:
+                          $var: $.metadata.isClosed
+                        is: 'true'
+                      - $eval:
+                          $var: $.metadata.probability
+                        is: '0.0'
+                  value: lost
+              default: open
+        fieldsToCollection:
+          id:
+            $var: $.id
+          label:
+            $var: $.name
+          metadata:
+            isClosed:
+              $case:
+                cases:
+                  - filter:
+                      $eval:
+                        $var: $.state
+                      oneOf:
+                        - won
+                        - lost
+                    value: 'true'
+                default: 'false'
+            probability:
+              $case:
+                cases:
+                  - filter:
+                      $eval:
+                        $var: $.state
+                      is: lost
+                    value: '0.0'
+                  - filter:
+                      $eval:
+                        $var: $.state
+                      is: won
+                    value: '1.0'
+id: 62471fad996d5c297ae43f5f
+uuid: 2533a7ba-27ff-4f1b-8e73-1d6154ee5fae
+baseUri: s3://integration-app-connectors/public/415fdf0b-456c-4a63-b85f-fde073785c85
+revision: 8e82c9c9-1ed3-47f4-bbcb-1ddd5b0ea52e
+hasReadme: true
+status: production
+categories:
+  - CRM
+  - Marketing Automation
+udms:
+  - activities
+  - companies
+  - contacts
+  - deals
+  - meetings
+  - notes
+  - users
+  - tasks
+  - campaigns
+  - emails
+  - deal-stages
+isReadOnly: true
+popularity: 1555
+appUuid: c04f4af3-1704-4693-86a4-9af453205335
+dataCollectionsCount: 31
+operationsCount: 646
+eventsCount: 1
+version: 1.4.25

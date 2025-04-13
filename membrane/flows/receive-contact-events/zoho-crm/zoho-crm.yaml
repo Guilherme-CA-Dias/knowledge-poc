@@ -1,0 +1,134 @@
+key: receive-contact-events
+id: 67f696bc8dc64db93eb4c97e
+name: Receive Contact Events
+isDeactivated: false
+universalFlowId: 67f696bc8dc64db93eb4c904
+integrationId: 67f64cbb3980f21ca4b24e17
+integration:
+  key: zoho-crm
+  state: READY
+  errors: []
+  isDeactivated: false
+  id: 67f64cbb3980f21ca4b24e17
+  name: Zoho CRM
+  uuid: c8f9e2ce-f60e-4701-9da4-3a157494b98c
+  connectorId: 64a158e7d2605720d232e07b
+  hasDefaultParameters: false
+  hasMissingParameters: false
+  hasDocumentation: false
+  hasOperations: true
+  hasData: true
+  hasEvents: false
+  hasGlobalWebhooks: false
+  hasUdm: true
+  areParametersCustomized: false
+  baseUri: s3://integration-app-connectors/public/8bd484fb-1889-4849-9553-8869df1f9be5
+  connectorVersion: 2.1.16
+  logoUri: https://static.integration.app/connectors/zoho-crm/logo.png
+  appUuid: ae83d614-3dee-48a6-8b2d-944d1ff80687
+  dataCollectionsCount: 19
+  operationsCount: 569
+  eventsCount: 0
+  authType: oauth2
+nodes:
+  contact-created-trigger:
+    type: data-record-created-trigger
+    name: Contact Created Trigger
+    config:
+      dataSource:
+        key: contacts
+      fieldMapping: {}
+    links:
+      - key: get-all-contact-fields-by-id
+  contact-updated-trigger:
+    type: data-record-updated-trigger
+    name: Contact Updated Trigger
+    config:
+      dataSource:
+        key: contacts
+      fieldMapping: {}
+    links:
+      - key: get-all-contact-fields-by-id2
+  get-all-contact-fields-by-id:
+    type: find-data-record-by-id
+    name: Get all Contact fields by Id
+    config:
+      dataSource:
+        key: contacts
+      fieldMapping:
+        key: contacts
+        includeRawFields: true
+      id:
+        $var: $.input.contact-created-trigger.record.id
+    links:
+      - key: create-contact-in-my-app
+  get-all-contact-fields-by-id2:
+    type: find-data-record-by-id
+    name: Get all Contact fields by Id
+    config:
+      dataSource:
+        key: contacts
+      id:
+        $var: $.input.contact-updated-trigger.record.id
+      fieldMapping:
+        key: contacts
+        includeRawFields: false
+    links:
+      - key: update-contact-in-my-app
+  create-contact-in-my-app:
+    type: api-request-to-your-app
+    name: Create Contact in my App
+    config:
+      request:
+        body:
+          externalContactId:
+            $var: $.input.get-all-contact-fields-by-id.id
+          data:
+            $var: $.input.get-all-contact-fields-by-id
+          userId:
+            $var: $.user.id
+        uri: /api/webhook
+        method: POST
+    links: []
+  update-contact-in-my-app:
+    type: api-request-to-your-app
+    name: Update Contact in my App
+    config:
+      request:
+        body:
+          externalContactId:
+            $var: $.input.get-all-contact-fields-by-id2.id
+          data:
+            $var: $.input.get-all-contact-fields-by-id2
+          userId:
+            $var: $.user.id
+        uri: /api/webhook
+        method: POST
+    links: []
+  delete-contact-in-my-app:
+    type: api-request-to-your-app
+    name: Delete Contact from My App
+    config:
+      request:
+        body:
+          externalContactId:
+            $var: $.input.contact-deleted-trigger.record.id
+          userId:
+            $var: $.user.id
+          externalContactDeleted: true
+        method: POST
+        uri: /api/webhook
+    links: []
+  contact-deleted-trigger:
+    type: data-record-deleted-trigger
+    name: Contact Deleted Trigger
+    config:
+      dataSource:
+        key: contacts
+      fieldMapping: {}
+    links:
+      - key: delete-contact-in-my-app
+autoCreateInstances: false
+customized: false
+isDeployed: true
+integrationKey: zoho-crm

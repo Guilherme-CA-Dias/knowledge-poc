@@ -1,0 +1,5 @@
+workspaces:
+  default:
+    key: your_workspace_key_here
+    secret: your_workspace_secret_here
+    apiUri: https://api.integration.app

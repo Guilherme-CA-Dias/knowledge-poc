@@ -1,0 +1,40 @@
+key: contacts
+isDeactivated: false
+id: 67f696b88dc64db93eb4c852
+name: Contacts
+customized: true
+dataSourceKey: contacts
+appSchema:
+  type: object
+  properties:
+    first_name:
+      type: string
+    last_name:
+      type: string
+    email:
+      type: string
+    phone:
+      type: string
+    id:
+      type: string
+direction: both
+defaultImportValue:
+  first_name:
+    $var: $.firstName
+  last_name:
+    $var: $.lastName
+  email:
+    $var: $.primaryEmail
+  phone:
+    $var: $.primaryPhone
+  id:
+    $var: $.id
+defaultExportValue:
+  firstName:
+    $var: $.first_name
+  lastName:
+    $var: $.last_name
+  primaryEmail:
+    $var: $.email
+  primaryPhone:
+    $var: $.phone

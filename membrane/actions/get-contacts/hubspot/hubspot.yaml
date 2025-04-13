@@ -1,0 +1,26 @@
+isCustomized: false
+parentId: 67f696ba8dc64db93eb4c888
+integrationId: 67f64cbbbdb16f2ecd4d2366
+key: get-contacts
+state: READY
+errors: []
+isDeactivated: false
+id: 67f696ba8dc64db93eb4c898
+name: Get Contacts
+archivedAt: null
+type: list-data-records
+inputSchema:
+  type: object
+  properties:
+    cursor:
+      type: string
+config:
+  dataSource:
+    key: contacts
+  cursor:
+    $var: $.input.cursor
+  fieldMapping:
+    key: contacts
+    includeRawFields: false
+isDeployed: false
+integrationKey: hubspot

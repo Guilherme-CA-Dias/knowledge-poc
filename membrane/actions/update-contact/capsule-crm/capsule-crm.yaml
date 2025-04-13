@@ -1,0 +1,44 @@
+isCustomized: false
+parentId: 67f92b431c400fba47391068
+integrationId: 67f696b68dc64db93eb4c740
+key: update-contact
+state: READY
+errors: []
+isDeactivated: false
+id: 67f92bc8e360d4d57fb60016
+name: Update Contact
+archivedAt: null
+type: update-data-record
+inputSchema:
+  type: object
+  properties:
+    first_name:
+      type: string
+    last_name:
+      type: string
+    email:
+      type: string
+    phone:
+      type: string
+    id:
+      type: string
+config:
+  dataSource:
+    key: contacts
+  id:
+    $var: $.input.id
+  fieldMapping:
+    key: contacts
+    input:
+      first_name:
+        $var: $.input.first_name
+      last_name:
+        $var: $.input.last_name
+      email:
+        $var: $.input.email
+      phone:
+        $var: $.input.phone
+      id:
+        $var: $.input.id
+isDeployed: false
+integrationKey: capsule-crm

@@ -1,0 +1,26 @@
+isCustomized: false
+parentId: 67f696ba8dc64db93eb4c888
+integrationId: 67f696b68dc64db93eb4c742
+key: get-contacts
+state: READY
+errors: []
+isDeactivated: false
+id: 67f696ba8dc64db93eb4c89d
+name: Get Contacts
+archivedAt: null
+type: list-data-records
+inputSchema:
+  type: object
+  properties:
+    cursor:
+      type: string
+config:
+  dataSource:
+    key: contacts
+  cursor:
+    $var: $.input.cursor
+  fieldMapping:
+    key: contacts
+    includeRawFields: false
+isDeployed: true
+integrationKey: pipedrive

@@ -1,0 +1,39 @@
+key: contacts
+isDeactivated: false
+id: 67f696b88dc64db93eb4c84b
+name: Contacts
+archivedAt: null
+integrationId: 67f64cbb3980f21ca4b24e17
+customized: false
+universalDataSourceId: 67f696b88dc64db93eb4c82f
+collectionKey: Contacts
+collectionParameters: {}
+udm: contacts
+defaultPath: /data/Contacts
+integration:
+  key: zoho-crm
+  state: READY
+  errors: []
+  isDeactivated: false
+  id: 67f64cbb3980f21ca4b24e17
+  name: Zoho CRM
+  uuid: c8f9e2ce-f60e-4701-9da4-3a157494b98c
+  connectorId: 64a158e7d2605720d232e07b
+  hasDefaultParameters: false
+  hasMissingParameters: false
+  hasDocumentation: false
+  hasOperations: true
+  hasData: true
+  hasEvents: false
+  hasGlobalWebhooks: false
+  hasUdm: true
+  areParametersCustomized: false
+  baseUri: s3://integration-app-connectors/public/8bd484fb-1889-4849-9553-8869df1f9be5
+  connectorVersion: 2.1.16
+  logoUri: https://static.integration.app/connectors/zoho-crm/logo.png
+  appUuid: ae83d614-3dee-48a6-8b2d-944d1ff80687
+  dataCollectionsCount: 19
+  operationsCount: 569
+  eventsCount: 0
+  authType: oauth2
+integrationKey: zoho-crm

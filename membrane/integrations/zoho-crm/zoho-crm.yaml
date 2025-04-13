@@ -1,0 +1,6 @@
+id: 67f64cbb3980f21ca4b24e17
+key: zoho-crm
+name: Zoho CRM
+connectorId: 64a158e7d2605720d232e07b
+baseUri: s3://integration-app-connectors/public/8bd484fb-1889-4849-9553-8869df1f9be5
+connectorVersion: 2.1.16

@@ -1,0 +1,6 @@
+id: 67f696b68dc64db93eb4c740
+key: capsule-crm
+name: Capsule CRM
+connectorId: 640734343685521f9f0c9fe7
+baseUri: s3://integration-app-connectors/public/ea8e90db-b4bc-4aa9-ab34-bf6c8fcd8b4f
+connectorVersion: 1.1.0
