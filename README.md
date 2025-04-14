@@ -58,6 +58,11 @@ This app requires some Actions and a Flow. To re-create those in your own Integr
 
 The CLI tool was used to populate the `/membrane` directory with the required components.
 
+```bash
+# Copy the sample membrane config file
+cp membrane.config.sample.yml membrane.config.yml
+```
+
 To set up your workspace, update the `membrane.config.yml` file with your workspace details and push to it using the CLI tool.
 
 ## Running the Application
