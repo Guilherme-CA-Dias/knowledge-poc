@@ -8,7 +8,7 @@ This is a template for an application showcasing integration capabilities using 
 * import all CRM contacts
 * continuously sync updates from CRM contacts
 * lookup contact by email or phone number
-* update a contact
+* update a contact in a CRM
 
 This repo also includes files to create the required actions and flows in your own Integration.app workspace. See below for details.
 
@@ -16,6 +16,7 @@ This repo also includes files to create the required actions and flows in your o
 
 - Node.js 18+ installed
 - Integration.app workspace credentials (Workspace Key and Secret)
+- Empty MongoDB database connection string
 
 ## App Setup
 
@@ -95,7 +96,7 @@ The template implements a simple authentication mechanism using a randomly gener
 
 ### Contacts Example
 
-The template includes a complete example of importing and managing users from an external application:
+The template includes an example of importing and managing contacts from an external application:
 
 - Contact data model and TypeScript types
 - API routes for contact import and retrieval

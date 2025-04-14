@@ -50,4 +50,5 @@ const contactSchema = new mongoose.Schema<IContact>(
 const connection = mongoose.connection.useDb(dbName);
 
 // This creates a 'contacts' collection in the local-deployments database
-export const Contact = connection.models.Contact || connection.model<IContact>('Contact', contactSchema); 
+export const Contact = connection.models.Contact || connection.model<IContact>('PipedriveContact', contactSchema); 
+// export const Contact = connection.models.Contact || connection.model<IContact>('Contact', contactSchema); 
