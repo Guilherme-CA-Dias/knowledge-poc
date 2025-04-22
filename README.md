@@ -7,7 +7,6 @@ This is a template for an application showcasing integration capabilities using 
 * manage field mappings
 * import all CRM contacts
 * continuously sync updates from CRM contacts
-* lookup contact by email or phone number
 * update a contact in a CRM
 
 This repo also includes files to create the required actions and flows in your own Integration.app workspace. See below for details.
@@ -83,7 +82,6 @@ yarn dev
   - `/api` - Backend API routes for contacts and integration token management
   - `/contacts` - Example implementation of external data import
   - `/integrations` - Integration and field mapping management
-  - `/lookup` - Looking up contact by phone or email, and updating contact
 - `/src/components` - Reusable React components
 - `/src/lib` - Utility functions and helpers
 - `/src/models` - Data models and types
