@@ -15,6 +15,7 @@ export function FlowToggle({ integration, label, flowSelector }: SyncButtonProps
   const integrationApp = useIntegrationApp()
   const [isEnabled, setIsEnabled] = useState<boolean | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [flowState, setFlowState] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchFlowState = async () => {
@@ -22,15 +23,23 @@ export function FlowToggle({ integration, label, flowSelector }: SyncButtonProps
       
       try {
         // Get the current flow enabled state
-        const flowState = await integrationApp
+        const flowData = await integrationApp
           .connection(integration.connection.id)
           .flow(flowSelector)
           .get({ autoCreate: true })
 
-        setIsEnabled(flowState.enabled)
+        console.log(`Flow data for ${integration.name}:`, flowData)
+        
+        // Check if flow state is READY
+        setFlowState(flowData.flow?.state || null)
+        
+        // Set enabled based on both the enabled flag and the READY state
+        const isReady = flowData.flow?.state === "READY"
+        setIsEnabled(flowData.enabled && isReady)
       } catch (error) {
         console.error(`Failed to fetch flow state for ${integration.name}:`, error)
         setIsEnabled(false)
+        setFlowState(null)
       } finally {
         setIsLoading(false)
       }
@@ -60,6 +69,9 @@ export function FlowToggle({ integration, label, flowSelector }: SyncButtonProps
 
   if (!integration.connection?.id) return null
 
+  // Determine if the toggle should be disabled
+  const isToggleDisabled = isLoading || flowState !== "READY"
+
   return (
     <div className="flex items-center space-x-2">
       <Label htmlFor="continuous-import" className="text-sm font-medium">
@@ -75,10 +87,15 @@ export function FlowToggle({ integration, label, flowSelector }: SyncButtonProps
             id="continuous-import"
             checked={!!isEnabled}
             onCheckedChange={handleToggle}
-            disabled={isLoading}
+            disabled={isToggleDisabled}
           />
         )}
       </div>
+      {flowState && flowState !== "READY" && (
+        <span className="text-xs text-amber-600 ml-2">
+          Flow not ready
+        </span>
+      )}
     </div>
   )
 } 

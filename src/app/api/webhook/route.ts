@@ -2,6 +2,43 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 import { Contact } from '@/models/contact';
 
+/**
+ * Expected webhook payload format:
+ * 
+ * For contact updates from integrations:
+ * {
+ *   userId: string;           // The customer ID in our system
+ *   externalContactId: string; // The contact ID in the external system
+ *   externalContactDeleted: boolean; // Whether the contact was deleted
+ *   data: {
+ *     id: string | number;    // Contact ID
+ *     name?: string;          // Contact name
+ *     fields?: {              // Contact fields
+ *       [key: string]: any;   // Various fields like email, phone, etc.
+ *     };
+ *     createdTime?: string;   // When the contact was created
+ *     updatedTime?: string;   // When the contact was last updated
+ *     [key: string]: any;     // Any other properties
+ *   };
+ * }
+ * 
+ * For contact updates from our system to integrations (via /api/contacts/[id]):
+ * {
+ *   type: 'updated';          // The type of event
+ *   data: {                   // The updated contact data
+ *     id: string;             // Contact ID
+ *     name: string;           // Contact name
+ *     fields: {               // Contact fields
+ *       [key: string]: any;   // Various fields like email, phone, etc.
+ *     };
+ *     createdTime?: string;   // When the contact was created
+ *     updatedTime?: string;   // When the contact was last updated
+ *     uri?: string;           // Optional URI for the contact
+ *   };
+ *   customerId: string;       // The customer ID in our system
+ * }
+ */
+
 interface WebhookPayload {
   userId: string;
   externalContactId: string;

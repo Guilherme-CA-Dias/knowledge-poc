@@ -8,18 +8,27 @@ import {
 } from "@/components/ui/table"
 import { Contact } from "@/types/contact"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useState } from "react"
+import { PencilIcon, CheckIcon, XIcon } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 
 interface ContactsTableProps {
   contacts: Contact[]
   isLoading?: boolean
   isError?: Error | null
+  onUpdateContact?: (contactId: string, updatedData: Partial<Contact>) => Promise<void>
 }
 
 export function ContactsTable({
   contacts,
   isLoading = false,
   isError = null,
+  onUpdateContact,
 }: ContactsTableProps) {
+  const [editingContact, setEditingContact] = useState<string | null>(null)
+  const [editData, setEditData] = useState<Partial<Contact>>({})
+
   const formatDate = (dateString?: string) => {
     if (!dateString) return "-";
     try {
@@ -28,6 +37,45 @@ export function ContactsTable({
       return "-";
     }
   };
+
+  const handleEdit = (contact: Contact) => {
+    setEditingContact(contact.id)
+    setEditData({
+      name: contact.name,
+      fields: {
+        ...contact.fields,
+        email: contact.fields?.email || contact.fields?.primaryEmail || "",
+        phone: contact.fields?.phone || contact.fields?.primaryPhone || "",
+      }
+    })
+  }
+
+  const handleSave = async () => {
+    if (editingContact && onUpdateContact) {
+      await onUpdateContact(editingContact, editData)
+      setEditingContact(null)
+      setEditData({})
+    }
+  }
+
+  const handleCancel = () => {
+    setEditingContact(null)
+    setEditData({})
+  }
+
+  const handleChange = (field: string, value: string) => {
+    if (field === 'name') {
+      setEditData(prev => ({ ...prev, name: value }))
+    } else {
+      setEditData(prev => ({
+        ...prev,
+        fields: {
+          ...(prev.fields || {}),
+          [field]: value
+        }
+      }))
+    }
+  }
 
   if (isError) {
     return (
@@ -116,18 +164,45 @@ export function ContactsTable({
               </TableRow>
             ) : (
               contacts.map((contact) => (
-                <TableRow key={`${contact.id}-${contact.customerId}`}>
+                <TableRow 
+                  key={`${contact.id}-${contact.customerId}`}
+                  className="group relative"
+                >
                   <TableCell style={{ ...tableStyles.cell, width: columnWidths.id }} className="font-medium">
                     {contact.id}
                   </TableCell>
                   <TableCell style={{ ...tableStyles.cell, width: columnWidths.name }}>
-                    {contact.name || "-"}
+                    {editingContact === contact.id ? (
+                      <Input 
+                        value={editData.name || ''} 
+                        onChange={(e) => handleChange('name', e.target.value)}
+                        className="h-8 w-full"
+                      />
+                    ) : (
+                      contact.name || "-"
+                    )}
                   </TableCell>
                   <TableCell style={{ ...tableStyles.cell, width: columnWidths.email }}>
-                    {contact.fields?.email || "-"}
+                    {editingContact === contact.id ? (
+                      <Input 
+                        value={editData.fields?.email || ''} 
+                        onChange={(e) => handleChange('email', e.target.value)}
+                        className="h-8 w-full"
+                      />
+                    ) : (
+                      contact.fields?.email || contact.fields?.primaryEmail || "-"
+                    )}
                   </TableCell>
                   <TableCell style={{ ...tableStyles.cell, width: columnWidths.phone }}>
-                    {contact.fields?.phone || "-"}
+                    {editingContact === contact.id ? (
+                      <Input 
+                        value={editData.fields?.phone || ''} 
+                        onChange={(e) => handleChange('phone', e.target.value)}
+                        className="h-8 w-full"
+                      />
+                    ) : (
+                      contact.fields?.phone || contact.fields?.primaryPhone || "-"
+                    )}
                   </TableCell>
                   <TableCell style={{ ...tableStyles.cell, width: columnWidths.createdAt }}>
                     {formatDate(contact.createdTime || contact.created_at)}
@@ -135,6 +210,38 @@ export function ContactsTable({
                   <TableCell style={{ ...tableStyles.cell, width: columnWidths.updatedAt }}>
                     {formatDate(contact.updatedTime || contact.updated_at)}
                   </TableCell>
+                  
+                  {editingContact === contact.id ? (
+                    <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-1">
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        onClick={handleSave}
+                        className="h-8 w-8"
+                      >
+                        <CheckIcon className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        onClick={handleCancel}
+                        className="h-8 w-8"
+                      >
+                        <XIcon className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="absolute right-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        onClick={() => handleEdit(contact)}
+                        className="h-8 w-8"
+                      >
+                        <PencilIcon className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
                 </TableRow>
               ))
             )}
