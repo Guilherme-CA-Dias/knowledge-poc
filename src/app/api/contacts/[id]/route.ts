@@ -67,7 +67,7 @@ export async function PATCH(
     // Get the updated contact
     const updatedContact = await Contact.findOne({
       id: contactId
-    });
+    }).lean(); // Use lean() to get a plain JavaScript object
 
     if (!updatedContact) {
       console.log('Failed to retrieve updated contact');
@@ -80,13 +80,31 @@ export async function PATCH(
     const webhookUrl = 'https://api.integration.app/webhooks/app-events/802541f3-76a3-4559-b8d4-4145af7c4386';
     console.log('Webhook URL:', webhookUrl);
     
+    // Create a clean data object with base contact properties
+    const cleanData: any = {
+      id: updatedContact.id,
+      name: updatedContact.name,
+      createdTime: updatedContact.createdTime,
+      updatedTime: new Date().toISOString(),
+      uri: updatedContact.uri
+    };
+    
+    // Add all fields from the fields object directly to the clean data
+    if (updatedContact.fields && typeof updatedContact.fields === 'object') {
+      Object.entries(updatedContact.fields).forEach(([key, value]) => {
+        cleanData[key] = value;
+      });
+    }
+    
+    console.log('Clean data:', JSON.stringify(cleanData, null, 2));
+    
     // Prepare the payload according to the required schema
     const webhookPayload = {
       type: 'updated',
-      data: updatedContact, // Send the entire contact object as data
-      customerId: customerId // Use the customerId from the request body
+      data: cleanData,
+      customerId: customerId
     };
-
+    
     console.log('Webhook payload:', JSON.stringify(webhookPayload, null, 2));
 
     try {
